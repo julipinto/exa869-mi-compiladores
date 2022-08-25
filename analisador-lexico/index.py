@@ -5,7 +5,11 @@ demo = root + "demofile.txt"
 operadores_aritmeticos = ["+", "-", "*", "/", "++", "--"] 
 operadores_relacionais = ["!=", "==", "<", ">", "<=", ">=", "="]
 operadores_logicos = ["&&", "||", "!"]
-deliminadores = [";", ",", "(", ")", "[", "]", "{", "}", "."]
+deliminadores = [";", ",", "(", ")", "[", "]", "{", "}", ".", " ", "\t"]
+reservadas = ["var", "const", "struct", "extends", "procedure",
+              "function", "start", "return", "if", "else", "then",
+              "while", "read", "print", "int", "real", "boolean",
+              "string", "true", "false"]
 
 """
   Dado uma linha e um index, ele verifica se a linha nesse index
@@ -31,16 +35,18 @@ def acharString(linha, index_aspas):
 def isSpace(char):
   return char == " " or char == "\t"
 
+def isDelimiter(char):
+  return char in ["(", ")", ";", ",", "=", ":", ".", ">", "<", "!", "&", "|", "~", "^", "*", "/", "-", "+", " ", "\t"]
+
 def findNext(linha, index):
   final_string = index
   line_length = len(linha)
   string = ""
-  delimiter = ["(", ")", ";", ",", "=", ":", ".", ">", "<", "!", "&", "|", "~", "^", "*", "/", "-", "+", " ", "\t"]
 
   while final_string < line_length:
-    string += linha[final_string]
-    if final_string > index and linha[final_string] in delimiter:
+    if final_string >= index and linha[final_string] in deliminadores:
       break
+    string += linha[final_string]
     final_string += 1
 
   return (string, final_string)
@@ -55,8 +61,13 @@ def tratarLinha(linha):
       elif isSpace(linha[index]):
         index += 1
         continue
+      elif isDelimiter(linha[index]):
+        palavra = linha[index]
       else:
         (palavra, index) = findNext(linha, index)
+        if palavra in reservadas:
+          print('palavra reservada', palavra)
+          continue
       
       print("palavra\t",palavra)
 
