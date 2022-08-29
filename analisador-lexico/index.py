@@ -13,7 +13,7 @@ reserved_regex = re.compile("(?:boolean|const|e(?:lse|xtends)|f(?:alse|unction)|
   são aspas, e a partir daí ele vai concatenando os caracteres
   até encontrar o fechamento das aspas.
 """
-def acharString(line, first_index):
+def handleString(line, first_index):
   if line[first_index] != '"':
     raise Exception("Não há aspas nesse index")
 
@@ -56,7 +56,7 @@ def findNext(linha, index):
 
   return (string, final_string)
 
-def tratarLinha(linha):
+def handleLine(linha):
     line_length = len(linha)
     index = 0
     while index < line_length:
