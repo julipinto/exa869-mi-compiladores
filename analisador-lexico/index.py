@@ -13,26 +13,26 @@ reserved_regex = re.compile("(?:boolean|const|e(?:lse|xtends)|f(?:alse|unction)|
   são aspas, e a partir daí ele vai concatenando os caracteres
   até encontrar o fechamento das aspas.
 """
-def acharString(linha, index_primeira_aspas):
-  if linha[index_primeira_aspas] != '"':
+def acharString(line, first_index):
+  if line[first_index] != '"':
     raise Exception("Não há aspas nesse index")
 
-  index_final_string = index_primeira_aspas
-  tamanho_linha = len(linha)
+  last_index = first_index
+  line_length = len(line)
   string = ""
 
-  while index_final_string < tamanho_linha:
-    string += linha[index_final_string]
-    if index_final_string > index_primeira_aspas and linha[index_final_string] == '"':
+  while last_index < line_length:
+    string += line[last_index]
+    if last_index > first_index and line[last_index] == '"':
       break
-    index_final_string += 1
+    last_index += 1
 
   if string[-1] != '"':
     #NESSE PONTO ELE ACHOU UMA STRING QUE NÃO FECHOU AS ASPAS
     raise Exception("String não fechou aspas")
     pass
 
-  return (string, index_final_string)
+  return (string, last_index)
 
 def isSpace(char):
   return char == " " or char == "\t"
