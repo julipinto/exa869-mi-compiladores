@@ -2,7 +2,7 @@ a
 b
 c
 aaaaa
-
+33.3    33  33.33333 33.33. 311222.
 "Isso é uma string" kjadhkjsh      "outra""mais uma"
 "mais uma nova string"
 print()
