@@ -112,6 +112,9 @@ def findEndBlock(line, index_start):
         comment[-2] == '*' and 
         comment[-1] == '/'):
 
+        # ISSO TA COM UM CHEIRO RUIM, POR FAVOR AJEITAR
+        if comment == '/*/':
+          continue
         #if(len(comment) > 3 and 
         #comment[-3] != '/'):
         #  continue
