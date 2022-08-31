@@ -6,8 +6,8 @@ aaaaa
 "Isso é uma string" kjadhkjsh      "outra""mais uma"
 "mais uma nova string"
 print()
-print("isso é uma string") /*comentário*/ /*
+print("isso é uma string") /*  comentário*/ /*
 
 
 comentáaaaario
-*/
+*//*/*/ / /*/
