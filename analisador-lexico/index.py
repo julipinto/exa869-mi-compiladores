@@ -139,8 +139,8 @@ def handleLine(linha):
         is_comment_block = not achou
         block_comment += comment
         if achou:
-          block_comment = ""
           print("achou o comentário \n", block_comment)
+          block_comment = ""
         index += 1
         continue
       elif linha[index] == '"':

@@ -10,4 +10,4 @@ print("isso é uma string") /*comentário*/ /*
 
 
 comentáaaaario
-*/
+*/ /
