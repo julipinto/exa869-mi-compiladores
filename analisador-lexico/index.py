@@ -97,7 +97,7 @@ def lineComment(line, index):
 
 """
 TODO
--- Corrigir comentário de bloco fechando ao encontrar /*/
+-- Corrigir comentário de bloco fechando ao encontrar /*/ [CORRIGIDO AGORA TEM QUE TESTAR]
 -- Implementar erro, bloco não fechou o comentário
 """
 
@@ -106,19 +106,17 @@ def findEndBlock(line, index_start):
   index_end = index_start
   comment = ""
 
+  current_block_length = len(block_comment)
+
   while index_end < line_length:
     comment += line[index_end]
     if (len(comment) > 1 and
         comment[-2] == '*' and 
         comment[-1] == '/'):
 
-        # ISSO TA COM UM CHEIRO RUIM, POR FAVOR AJEITAR
-        if comment == '/*/':
+        if current_block_length + len(comment) < 4:
           continue
-        #if(len(comment) > 3 and 
-        #comment[-3] != '/'):
-        #  continue
-          
+
         return (True, comment, index_end)
     index_end += 1
   
