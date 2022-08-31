@@ -58,24 +58,6 @@ def findNumber(line, first_index):
     raise Exception("Um ponto precisa ser seguido de outro número")
   return (number, last_index)
 
-def isComment(line, first_index):
-  last_index = first_index
-  line_length = len(line)
-  comment = ""
-
-  while last_index < line_length:
-    if(line[last_index] == '*'):
-      comment += line[last_index]
-      if(line[last_index+1] == '/'):
-        comment += line[last_index+1]
-        last_index += 2
-        break
-    last_index += 1
-
-  if(comment[last_index-1] != '*' and comment[-1] != '/'):
-    raise Exception("Um ponto precisa ser seguido de outro número")
-  return (comment, last_index)
-
 def isSpace(char):
   return char == " " or char == "\t"
 
@@ -112,6 +94,13 @@ def lineComment(line, index):
 
   return (comment, index_end)
 
+
+"""
+TODO
+-- Corrigir comentário de bloco fechando ao encontrar /*/
+-- Implementar erro, bloco não fechou o comentário
+"""
+
 def findEndBlock(line, index_start):
   line_length = len(line)
   index_end = index_start
@@ -119,8 +108,18 @@ def findEndBlock(line, index_start):
 
   while index_end < line_length:
     comment += line[index_end]
-    if len(comment) > 1 and  comment[-2] == '*' and comment[-1] == '/':
-      return (True, comment, index_end)
+    if (len(comment) > 1 and
+        comment[-2] == '*' and 
+        comment[-1] == '/'):
+
+        # ISSO TA COM UM CHEIRO RUIM, POR FAVOR AJEITAR
+        if comment == '/*/':
+          continue
+        #if(len(comment) > 3 and 
+        #comment[-3] != '/'):
+        #  continue
+          
+        return (True, comment, index_end)
     index_end += 1
   
   return (False, comment, index_end)
@@ -128,43 +127,59 @@ def findEndBlock(line, index_start):
 block_comment = ""
 is_comment_block = False
 
+"""
+-- verificar operadores
+-- melhorar funcao de delimitador
+-- simbolos de 32 - 126, exceto 34
+-- verificar numero negativo
+-- verificar se ele nao atende nenhum padrao
+-- logica do menos -
+"""
 def handleLine(linha):
     global block_comment, is_comment_block
     line_length = len(linha)
     index = 0
+
     while index < line_length:
       palavra = ""
+
       if is_comment_block:
         (achou, comment, index) = findEndBlock(linha, index)
         is_comment_block = not achou
         block_comment += comment
+
         if achou:
-          print("achou o comentário \n", block_comment)
+          print("achou um comentário \n", block_comment)
+
           block_comment = ""
         index += 1
         continue
+
       elif linha[index] == '"':
         (palavra, index) = findString(linha, index)
+
       elif isSpace(linha[index]):
         index += 1
         continue
+
       elif isDelimiter(linha[index]):
         palavra = linha[index]
+
       elif linha[index].isnumeric():
         (palavra, index) = findNumber(linha, index)
+
       elif linha[index] == '/':
-        if linha[index+1] == '/':
+
+        if index + 1 < line_length and linha[index+1] == '/':
           (comment, index) = lineComment(linha, index)
-        elif linha[index+1] == '*':
+
+        elif index + 1 < line_length and linha[index+1] == '*':
           is_comment_block = True
+          # Ele agora vai seguir para o primeiro if para encontrar todos os comentários
           continue
-        #  (achou, comment, index) = findEndBlock(linha, index)
-        #  is_comment_block = not achou
-        #  block_comment += comment
-        #if achou:
-        #  print("achou o comentário \n", block_comment)
         else:
-          palavra = linha[index] # vai ser um operador
+          # vai ser um operador
+          palavra = linha[index] 
 
       else:
         (palavra, index) = findNext(linha, index)
