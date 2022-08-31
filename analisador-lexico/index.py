@@ -58,24 +58,6 @@ def findNumber(line, first_index):
     raise Exception("Um ponto precisa ser seguido de outro número")
   return (number, last_index)
 
-def isComment(line, first_index):
-  last_index = first_index
-  line_length = len(line)
-  comment = ""
-
-  while last_index < line_length:
-    if(line[last_index] == '*'):
-      comment += line[last_index]
-      if(line[last_index+1] == '/'):
-        comment += line[last_index+1]
-        last_index += 2
-        break
-    last_index += 1
-
-  if(comment[last_index-1] != '*' and comment[-1] != '/'):
-    raise Exception("Um ponto precisa ser seguido de outro número")
-  return (comment, last_index)
-
 def isSpace(char):
   return char == " " or char == "\t"
 
@@ -116,6 +98,7 @@ def lineComment(line, index):
 """
 TODO
 -- Corrigir comentário de bloco fechando ao encontrar /*/
+-- Implementar erro, bloco não fechou o comentário
 """
 
 def findEndBlock(line, index_start):
