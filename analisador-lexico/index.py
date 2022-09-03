@@ -9,11 +9,9 @@ operadores_relacionais = {"!=", "==", "<", ">", "<=", ">=", "="}
 operadores_logicos = {"&&", "||", "!"}
 deliminadores = {";", ",", "(", ")", "[", "]", "{", "}", ".", " ", "\t"}
 reserved_regex = re.compile("(?:boolean|const|e(?:lse|xtends)|f(?:alse|unction)|i(?:nt|f)|pr(?:int|ocedure)|re(?:a[dl]|turn)|st(?:art|r(?:ing|uct))|t(?:hen|rue)|var|while)$")
-simbolos_ascii = {32, 33, range(35, 126)}
+simbolos_ascii = {i for i in range(32, 126) if i != 34}
 
 def isSymbol(caractere):
-  print(simbolos_ascii)
-  print(ord(caractere))
   return ord(caractere) in simbolos_ascii
 
 def findString(line, first_index):
@@ -30,7 +28,7 @@ def findString(line, first_index):
   string = ""
 
   while last_index < line_length:
-    if(not isSymbol(line[last_index])):
+    if(not isSymbol(line[last_index]) and line[last_index] != '"'):
       raise Exception("Caractere inválido")
     string += line[last_index]
     if last_index > first_index and line[last_index] == '"':
