@@ -11,6 +11,22 @@ deliminadores = {";", ",", "(", ")", "[", "]", "{", "}", ".", " ", "\t"}
 reserved_regex = re.compile("(?:boolean|const|e(?:lse|xtends)|f(?:alse|unction)|i(?:nt|f)|pr(?:int|ocedure)|re(?:a[dl]|turn)|st(?:art|r(?:ing|uct))|t(?:hen|rue)|var|while)$")
 simbolos_ascii = {i for i in range(32, 126) if i != 34}
 
+def isSpace(char):
+  return char == " " or char == "\t"
+
+def isDelimiter(char):
+  # return char in ["(", ")", ";", ",", "=", ":", ".", ">", "<", "!", "&", "|", "~", "^", "*", "-", "+", " ", "\t"]
+  return char in deliminadores
+
+def isRelationalOperator(char):
+  return char in operadores_relacionais
+
+def isLogicalOperator(char):
+  return char in operadores_logicos
+
+def isArithmeticOperator(char):
+  return char in operadores_aritmeticos
+
 def isSymbol(caractere):
   return ord(caractere) in simbolos_ascii
 
@@ -64,12 +80,6 @@ def findNumber(line, first_index):
   if(count_dot == 1 and not number[-1].isnumeric()):
     raise Exception("Um ponto precisa ser seguido de outro número")
   return (number, last_index)
-
-def isSpace(char):
-  return char == " " or char == "\t"
-
-def isDelimiter(char):
-  return char in ["(", ")", ";", ",", "=", ":", ".", ">", "<", "!", "&", "|", "~", "^", "*", "-", "+", " ", "\t"]
 
 """
 Essa função vai achar o próximo conjunto de caracteres
@@ -135,10 +145,8 @@ is_comment_block = False
 """
 -- verificar operadores
 -- melhorar funcao de delimitador
--- simbolos de 32 - 126, exceto 34
 -- verificar numero negativo
 -- verificar se ele nao atende nenhum padrao
--- logica do menos -
 """
 def handleLine(linha):
     global block_comment, is_comment_block
@@ -148,7 +156,7 @@ def handleLine(linha):
     while index < line_length:
       palavra = ""
 
-      if is_comment_block:
+      if is_comment_block: # comentario de bloco
         (achou, comment, index) = findEndBlock(linha, index)
         is_comment_block = not achou
         block_comment += comment
@@ -160,17 +168,32 @@ def handleLine(linha):
         index += 1
         continue
 
-      elif linha[index] == '"':
+      elif linha[index] == '"': # cadeia de caractere
         (palavra, index) = findString(linha, index)
 
-      elif isSpace(linha[index]):
+      elif isSpace(linha[index]): # espaco
         index += 1
         continue
 
-      elif isDelimiter(linha[index]):
+      elif isDelimiter(linha[index]): # delimitador
         palavra = linha[index]
 
-      elif linha[index].isnumeric():
+      elif isRelationalOperator(linha[index]): # operador relacional
+        palavra = linha[index]
+        if index + 1 < line_length and isRelationalOperator(linha[index]+linha[index+1]):
+          index += 1
+          palavra = linha[index]
+          print('É um operador relacional: ', linha[index-1]+linha[index])
+        else:
+          print('É um operador relacional: ', linha[index])
+
+      elif linha[index] == '-':
+        if index + 1 < line_length and linha[index+1].isnumeric():
+          ...
+        else:
+          # é um operador aritmetico
+          ...
+      elif linha[index].isnumeric(): # numero
         (palavra, index) = findNumber(linha, index)
 
       elif linha[index] == '/':
@@ -178,7 +201,7 @@ def handleLine(linha):
         if index + 1 < line_length and linha[index+1] == '/':
           (comment, index) = lineComment(linha, index)
 
-        elif index + 1 < line_length and linha[index+1] == '*':
+        elif index + 1 < line_length and linha[index+1] == '*': # comentario
           is_comment_block = True
           # Ele agora vai seguir para o primeiro if para encontrar todos os comentários
           continue
