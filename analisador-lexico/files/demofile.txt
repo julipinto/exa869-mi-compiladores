@@ -1,14 +1,12 @@
-"#"
 
-a
 b
 c
 aaaaa
 33.3    33  33.33333 33.33. 311222
-"Isso é uma string" kjadhkjsh      "outra""mais uma"
+"Isso e uma string" kjadhkjsh      "outra""mais uma"
 "mais uma nova string"
 print()
-print("isso é uma string") /*  comentário*/ /*
+print("isso e uma string") /*  comentário*/ /*
 
 
 comentáaaaario

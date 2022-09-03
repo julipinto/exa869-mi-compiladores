@@ -1,3 +1,4 @@
+import os
 import re
 
 root = "./files/"
@@ -11,6 +12,8 @@ reserved_regex = re.compile("(?:boolean|const|e(?:lse|xtends)|f(?:alse|unction)|
 simbolos_ascii = {32, 33, range(35, 126)}
 
 def isSymbol(caractere):
+  print(simbolos_ascii)
+  print(ord(caractere))
   return ord(caractere) in simbolos_ascii
 
 def findString(line, first_index):
@@ -200,7 +203,11 @@ def handleLine(linha):
 
 
 if __name__ == "__main__":
-  with open(demo, encoding = 'utf-8') as f:
-    for x in f:
-      x = x.strip()
-      handleLine(x)
+    pasta = './files'
+    for _, _, arquivos in os.walk(pasta):
+        for arquivo in arquivos:
+            print(arquivo)
+            with open(pasta+'/'+arquivo, encoding = 'utf-8') as f:
+              for x in f:
+                x = x.strip()
+                handleLine(x)
