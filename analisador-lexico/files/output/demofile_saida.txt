@@ -1,0 +1,38 @@
+0 CCH ""
+0 CCH ""
+0 REL ==
+0 REL =
+0 ART -
+0 NMF -2
+0 NMF 3
+0 LOG !
+1 IDE b
+1 LOG !
+1 LOG !
+1 LOG &&
+2 IDE c
+2 REL !=
+2 LOG ||
+2 CIN |
+3 IDE aaaaa
+4 NMF 33.3
+4 NMF 33
+4 NMF 33.33333
+4 NRO 33.33
+4 NRO 311222
+5 CCH "Isso e uma string"
+5 IDE kjadhkjsh
+5 CCH "outra"
+5 CCH "mais uma"
+6 CCH "mais uma nova string"
+7 COL // comentario de linha
+8 PRE print
+8 DEL 
+9 PRE print
+9 CCH "isso e uma string"
+9 DEL 
+9 COB /*  comentário*/
+13 COB /*comentáaaaario*/
+13 COB /*/*/
+13 ART /
+13 CoMF /*/

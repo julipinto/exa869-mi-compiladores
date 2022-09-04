@@ -1,6 +1,7 @@
 import os
 import re
 from enum import Enum
+from lib2to3.pgen2 import token
 
 
 class AcronymsEnum(Enum):
@@ -219,6 +220,17 @@ def handle_line(index_line, line):
       index_character += 1
       continue
 
+    elif current_caracter == '/': # reconhece comentário de linha ou bloco
+      if next_character == '/':
+        (comment, index_character) = line_comment(line, index_character)
+        tokens.append((index_line, AcronymsEnum.LINE_COMMENT.value, comment))
+
+      elif next_character == '*':
+        is_comment_block = True
+        continue # Ele agora vai seguir para o primeiro if para encontrar todos os comentários
+      else:
+        tokens.append((index_line, AcronymsEnum.ARITHMETIC_OPERATOR.value, current_caracter))
+
     elif current_caracter == '"': # reconhece cadeia de caractere
       (acronym, palavra, index_character) = find_string(line, index_character)
       tokens.append((index_line, acronym, palavra))
@@ -261,17 +273,6 @@ def handle_line(index_line, line):
         acronym = AcronymsEnum.INVALID_CHARACTER.value
       tokens.append((index_line, acronym, palavra))
 
-    elif current_caracter == '/': # reconhece comentário de linha ou bloco
-      if next_character == '/':
-        (comment, index_character) = line_comment(line, index_character)
-        tokens.append((index_line, AcronymsEnum.LINE_COMMENT.value, comment))
-
-      elif next_character == '*':
-        is_comment_block = True
-        continue # Ele agora vai seguir para o primeiro if para encontrar todos os comentários
-      else:
-        tokens.append((index_line, AcronymsEnum.ARITHMETIC_OPERATOR.value, current_caracter))
-
     elif(is_valid_string_symbol(current_caracter)): # reconhece identificador
       (palavra, index_character) = find_next(line, index_character)
       if reserved_regex.match(palavra):
@@ -300,6 +301,13 @@ def print_console_header(path_name):
   print("Analisando o arquivo: ", path_name)
   print("**********************************************")
 
+def salvar_analise_arquivo(name_file, tokens):
+  name_file = (os.path.splitext(name_file)[0]).replace('input', 'output')+'_saida.txt'
+  arquivo = open(name_file, 'w+', encoding="utf-8")
+  for token in tokens:
+    arquivo.write(re.sub("\(|\)|\'|,", '', str(token))+'\n')
+  arquivo.close()
+
 root = "./files/input"
 directory_files = [
   root+'/'+file_name
@@ -317,6 +325,7 @@ if __name__ == "__main__":
       if is_comment_block:
         print("Bloco de comentário não foi fechado")
         tokens.append((index_line, AcronymsEnum.UNFORMED_COMMENT.value , block_comment))
-    # AQUI VAI TER QUE SALVAR O TOKEN E RESETAR PRA PASSAR PRA O PRÓXIMO ARQUIVO
+    salvar_analise_arquivo(relative_path_name, tokens)
+    tokens = []
 
 print(tokens)
