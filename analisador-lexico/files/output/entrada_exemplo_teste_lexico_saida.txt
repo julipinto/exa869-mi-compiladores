@@ -1,5 +1,6 @@
 0 IDE exemplo
 0 IDE teste
+0 DEL ;
 2 PRE real
 2 IDE f
 2 REL =
@@ -10,20 +11,22 @@
 4 REL =
 4 CCU "teste
 6 PRE if
-6 DEL 
+6 DEL (
 6 IDE f
 6 REL >=
 6 NMF -10
 6 LOG &&
-6 DEL 
+6 DEL (
 6 IDE f
 6 REL <
-6 DEL 
+6 DEL )
 7 PRE print
-7 CCU "mensagem;
+7 DEL (
+7 CCU "mensagem);
 8 PRE print
+8 DEL (
 8 CCH "mens@gem"
-8 DEL 
+8 DEL )
 8 DEL ;
 9 COL // exemplo de teste do lexico
 13 CoMF /* exa869 mi processadores delinguagem de programacao

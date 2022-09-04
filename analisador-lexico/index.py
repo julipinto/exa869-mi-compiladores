@@ -35,7 +35,6 @@ def is_space(char):
   return char == " " or char == "\t"
 
 def is_delimiter(char):
-  # return char in ["(", ")", ";", ",", "=", ":", ".", ">", "<", "!", "&", "|", "~", "^", "*", "-", "+", " ", "\t"]
   return char in deliminadores
 
 def is_relational_operator(char):
@@ -108,21 +107,25 @@ def find_number(line, first_index):
   acronym = AcronymsEnum.NUMBER.value
 
   while last_index < line_length:
-    if(line[last_index] == '.'):
+    current_number = line[last_index]
+    if(current_number == '.'):
       if(count_dot == 0):
         count_dot = 1
-        number += line[last_index]
+        number += current_number
       else:
         break
-    elif(line[last_index].isnumeric()):
-      number += line[last_index]
+    elif(current_number.isnumeric()):
+      number += current_number
+    elif(is_space(current_number)):
+      break
     else:
       acronym = AcronymsEnum.UNFORMED_NUMBER.value
-      break
+
     last_index += 1
 
   if(count_dot == 1 and not number[-1].isnumeric()):
     acronym = AcronymsEnum.UNFORMED_NUMBER.value
+    print("segundo")
   return (acronym, number, last_index)
 
 """
@@ -184,9 +187,7 @@ is_comment_block = False
 
 """ TODO
 -- comentar todas as funcoes
--- salvar identificao em um arquivo
 -- melhorar funcao de delimitador ?
--- verificar se ele nao atende nenhum padrao e identificar como erro
 -- refatorar [TA INDO]
 """
 def handle_line(index_line, line):
@@ -208,17 +209,11 @@ def handle_line(index_line, line):
       block_comment += comment
 
       if has_found_end:
-        print("achou um comentário \n", block_comment)
         tokens.append((index_line, AcronymsEnum.BLOCK_COMMENT.value, block_comment))
         reset_variable_comment()
         
-      index_character += 1
-      continue
-
     elif is_space(current_caracter): # reconhece espaco
-      # ...
-      index_character += 1
-      continue
+      ...
 
     elif current_caracter == '/': # reconhece comentário de linha ou bloco
       if next_character == '/':
@@ -275,14 +270,14 @@ def handle_line(index_line, line):
 
     elif(is_valid_string_symbol(current_caracter)): # reconhece identificador
       (palavra, index_character) = find_next(line, index_character)
+      acronym = AcronymsEnum.IDENTIFIER.value
       if reserved_regex.match(palavra):
-        tokens.append((index_line, AcronymsEnum.RESERVED_WORD.value, palavra))
-      else:
-        tokens.append((index_line, AcronymsEnum.IDENTIFIER.value, palavra))
+        acronym = AcronymsEnum.RESERVED_WORD.value
+      tokens.append((index_line, acronym, palavra))
+      continue
+
     else: # Não foi possível identificar o token
       tokens.append((index_line, AcronymsEnum.INVALID_CHARACTER.value, current_caracter))
-
-    print("palavra\t",palavra)
 
     index_character += 1 # next index
 
@@ -305,7 +300,8 @@ def salvar_analise_arquivo(name_file, tokens):
   name_file = (os.path.splitext(name_file)[0]).replace('input', 'output')+'_saida.txt'
   arquivo = open(name_file, 'w+', encoding="utf-8")
   for token in tokens:
-    arquivo.write(re.sub("\(|\)|\'|,", '', str(token))+'\n')
+    str_token = str(token[0]) + " " + str(token[1]) + " " + str(token[2])
+    arquivo.write(str_token+'\n')
   arquivo.close()
 
 root = "./files/input"
@@ -323,9 +319,6 @@ if __name__ == "__main__":
         line = remove_line_garbage(line)
         handle_line(index_line, line)
       if is_comment_block:
-        print("Bloco de comentário não foi fechado")
         tokens.append((index_line, AcronymsEnum.UNFORMED_COMMENT.value , block_comment))
     salvar_analise_arquivo(relative_path_name, tokens)
     tokens = []
-
-print(tokens)
