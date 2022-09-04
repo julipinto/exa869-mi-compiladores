@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 import os
 import re
 
@@ -184,6 +185,11 @@ def handle_line(index_line, line):
   while index_character < line_length:
     palavra = ""
 
+    current_caracter = line[index_character]
+    next_character = None
+    if(index_character + 1 < line_length):
+      next_character = line[index_character + 1]
+
     if is_comment_block: # comentario de bloco
       (has_found_end, comment, index_character) = find_end_block_comment(line, index_character)
       is_comment_block = not has_found_end
@@ -197,46 +203,46 @@ def handle_line(index_line, line):
       index_character += 1
       continue
 
-    elif is_space(line[index_character]): # espaco
+    elif is_space(current_caracter): # espaco
       # ...
       index_character += 1
       continue
 
-    elif line[index_character] == '"': # cadeia de caractere
+    elif current_caracter == '"': # cadeia de caractere
       (palavra, index_character) = find_string(line, index_character)
 
-    elif is_delimiter(line[index_character]): # delimitador
-      palavra = line[index_character]
+    elif is_delimiter(current_caracter): # delimitador
+      palavra = current_caracter
 
-    elif(line[index_character] == '!'):
-      palavra = line[index_character]
-      if index_character + 1 < line_length and is_relational_operator(line[index_character]+line[index_character+1]):
+    elif(current_caracter == '!'):
+      palavra = current_caracter
+      if index_character + 1 < line_length and is_relational_operator(current_caracter+line[index_character+1]):
         index_character += 1
-        palavra = line[index_character]
-        print('É um operador relacional: ', line[index_character-1]+line[index_character])
+        palavra = current_caracter
+        print('É um operador relacional: ', line[index_character-1]+current_caracter)
       else:
-        print('É um operador lógico: ', line[index_character])
+        print('É um operador lógico: ', current_caracter)
 
-    elif is_relational_operator(line[index_character]): # operador relacional
-      palavra = line[index_character]
-      if index_character + 1 < line_length and is_relational_operator(line[index_character]+line[index_character+1]):
+    elif is_relational_operator(current_caracter): # operador relacional
+      palavra = current_caracter
+      if index_character + 1 < line_length and is_relational_operator(current_caracter+line[index_character+1]):
         index_character += 1
-        palavra = line[index_character]
-        print('É um operador relacional: ', line[index_character-1]+line[index_character])
+        palavra = current_caracter
+        print('É um operador relacional: ', line[index_character-1]+current_caracter)
       else:
-        print('É um operador relacional: ', line[index_character])
+        print('É um operador relacional: ', current_caracter)
     
-    elif helper_logical_operator(line[index_character]): # operador relacional
-      if index_character + 1 < line_length and is_logical_operator(line[index_character]+line[index_character+1]):
+    elif helper_logical_operator(current_caracter): # operador relacional
+      if index_character + 1 < line_length and is_logical_operator(current_caracter+line[index_character+1]):
         index_character += 1
         palavra = line[index_character-1]
-        palavra = line[index_character]
-        print('É um operador lógico: ', line[index_character-1]+line[index_character])
+        palavra = current_caracter
+        print('É um operador lógico: ', line[index_character-1]+current_caracter)
       else:
-        raise Exception("Operador lógico não encontrado: "+line[index_character])
+        raise Exception("Operador lógico não encontrado: "+current_caracter)
 
-    elif line[index_character] == '-':
-      palavra = line[index_character]
+    elif current_caracter == '-':
+      palavra = current_caracter
       acronym = 'ART'
       next_character = ignore_space(line, index_character+1)
       if next_character < line_length and line[next_character].isnumeric():
@@ -244,30 +250,29 @@ def handle_line(index_line, line):
         palavra += number
       tokens.append((index_line, acronym, palavra))
 
-    elif line[index_character].isnumeric(): # numero
+    elif current_caracter.isnumeric(): # numero
       (acronym, number, index_character) = find_number(line, index_character)
       tokens.append((index_line, acronym, number))
 
-    elif line[index_character] == '/': # comentario
-
-      if index_character + 1 < line_length and line[index_character+1] == '/':
+    elif current_caracter == '/': # comentario
+      if next_character == '/':
         (comment, index_character) = line_comment(line, index_character)
         tokens.append((index_line, "COL", comment))
 
-      elif index_character + 1 < line_length and line[index_character+1] == '*':
+      elif next_character == '*':
         is_comment_block = True
         continue # Ele agora vai seguir para o primeiro if para encontrar todos os comentários
       else:
-        tokens.append((index_line, "ART", line[index_character]))
+        tokens.append((index_line, "ART", current_caracter))
 
-    elif(is_valid_string_symbol(line[index_character])): # identificador
+    elif(is_valid_string_symbol(current_caracter)): # identificador
       (palavra, index_character) = find_next(line, index_character)
       if reserved_regex.match(palavra):
         tokens.append((index_line, "PRE", palavra))
       else:
         tokens.append((index_line, "IDE", palavra))
     else: # Não foi possível identificar o token
-      tokens.append((index_line, "CIN", line[index_character]))
+      tokens.append((index_line, "CIN", current_caracter))
 
     print("palavra\t",palavra)
 
