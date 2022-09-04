@@ -19,12 +19,12 @@ COB comentário de bloco
 COL comentário de linha
 """
 tokens = []
-operadores_aritmeticos = {"+", "-", "*", "/", "++", "--"} 
-operadores_relacionais = {"!=", "==", "<", ">", "<=", ">=", "="}
-operadores_logicos = {"&&", "||", "!"}
-deliminadores = {";", ",", "(", ")", "[", "]", "{", "}", ".", " ", "\t"}
+operadores_aritmeticos = ("+", "-", "*", "/", "++", "--")
+operadores_relacionais = ("!=", "==", "<", ">", "<=", ">=", "=")
+operadores_logicos = ("&&", "||", "!")
+deliminadores = (";", ",", "(", ")", "[", "]", "{", "}", ".", " ", "\t")
 reserved_regex = re.compile("(?:boolean|const|e(?:lse|xtends)|f(?:alse|unction)|i(?:nt|f)|pr(?:int|ocedure)|re(?:a[dl]|turn)|st(?:art|r(?:ing|uct))|t(?:hen|rue)|var|while)$")
-simbolos_ascii = {i for i in range(32, 126) if i != 34}
+simbolos_ascii = {i for i in range(32, 127) if i != 34}
 
 def is_space(char):
   return char == " " or char == "\t"
@@ -67,7 +67,7 @@ def find_string(line, first_index):
 
   while last_index < line_length:
     if(not is_valid_string_symbol(line[last_index]) and line[last_index] != '"'):
-      raise Exception("Caractere inválido")
+      raise Exception("Caractere inválido:", line[last_index])
     string += line[last_index]
     if last_index > first_index and line[last_index] == '"':
       break
