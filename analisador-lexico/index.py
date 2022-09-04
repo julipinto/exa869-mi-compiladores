@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 import os
 import re
 
@@ -46,6 +45,15 @@ def is_arithmetic_operator(char):
 
 def helper_logical_operator(char):
   return char in helper_operador_logico
+
+def confirm_operator(line, current_index, line_length, function):
+  operator = line[current_index]
+  compound_operator = False
+  if current_index + 1 < line_length and function(line[current_index]+line[current_index+1]):
+    current_index += 1
+    operator += line[current_index]
+    compound_operator = True
+  return (operator, current_index, compound_operator)
 
 def is_valid_string_symbol(caractere):
   return ord(caractere) in simbolos_ascii
@@ -215,31 +223,24 @@ def handle_line(index_line, line):
       palavra = current_caracter
 
     elif(current_caracter == '!'):
-      palavra = current_caracter
-      if index_character + 1 < line_length and is_relational_operator(current_caracter+line[index_character+1]):
-        index_character += 1
-        palavra = current_caracter
-        print('É um operador relacional: ', line[index_character-1]+current_caracter)
+      (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_relational_operator)
+      if(compound_operator):
+        acronym = 'REL'
       else:
-        print('É um operador lógico: ', current_caracter)
+        acronym = 'LOG'
+      tokens.append((index_line, acronym, palavra))
 
     elif is_relational_operator(current_caracter): # operador relacional
-      palavra = current_caracter
-      if index_character + 1 < line_length and is_relational_operator(current_caracter+line[index_character+1]):
-        index_character += 1
-        palavra = current_caracter
-        print('É um operador relacional: ', line[index_character-1]+current_caracter)
-      else:
-        print('É um operador relacional: ', current_caracter)
+      (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_relational_operator)
+      tokens.append((index_line, 'REL', palavra))
     
-    elif helper_logical_operator(current_caracter): # operador relacional
-      if index_character + 1 < line_length and is_logical_operator(current_caracter+line[index_character+1]):
-        index_character += 1
-        palavra = line[index_character-1]
-        palavra = current_caracter
-        print('É um operador lógico: ', line[index_character-1]+current_caracter)
+    elif helper_logical_operator(current_caracter): # operador logico
+      (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_logical_operator)
+      if(compound_operator):
+        acronym = 'LOG'
       else:
-        raise Exception("Operador lógico não encontrado: "+current_caracter)
+        acronym = 'CIN'
+      tokens.append((index_line, acronym, palavra))
 
     elif current_caracter == '-':
       palavra = current_caracter
