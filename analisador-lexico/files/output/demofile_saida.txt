@@ -34,7 +34,7 @@
 9 CCH "isso e uma string"
 9 DEL )
 9 COB /*  comentário*/
-13 COB /*comentáaaaario*/
+9 COB /*comentáaaaario*/
 13 COB /*/*/
 13 ART /
 13 CoMF /*/

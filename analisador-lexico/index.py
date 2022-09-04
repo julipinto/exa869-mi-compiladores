@@ -184,6 +184,7 @@ def find_end_block_comment(line, index_start):
 
 block_comment = ""
 is_comment_block = False
+index_block_comment = 0
 
 """ TODO
 -- comentar todas as funcoes
@@ -191,7 +192,7 @@ is_comment_block = False
 -- refatorar [TA INDO]
 """
 def handle_line(index_line, line):
-  global block_comment, is_comment_block
+  global block_comment, is_comment_block, index_block_comment
   line_length = len(line)
   index_character = 0
 
@@ -209,7 +210,7 @@ def handle_line(index_line, line):
       block_comment += comment
 
       if has_found_end:
-        tokens.append((index_line, AcronymsEnum.BLOCK_COMMENT.value, block_comment))
+        tokens.append((index_block_comment, AcronymsEnum.BLOCK_COMMENT.value, block_comment))
         reset_variable_comment()
         
     elif is_space(current_caracter): # reconhece espaco
@@ -221,6 +222,7 @@ def handle_line(index_line, line):
         tokens.append((index_line, AcronymsEnum.LINE_COMMENT.value, comment))
 
       elif next_character == '*':
+        index_block_comment = index_line
         is_comment_block = True
         continue # Ele agora vai seguir para o primeiro if para encontrar todos os comentários
       else:
