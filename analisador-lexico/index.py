@@ -221,7 +221,7 @@ def handle_line(index_line, line):
     if(index_character + 1 < line_length):
       next_character = line[index_character + 1]
 
-    if is_comment_block: # comentario de bloco
+    if is_comment_block: # reconhece comentário de bloco não finalizado
       (has_found_end, comment, index_character) = find_end_block_comment(line, index_character)
       is_comment_block = not has_found_end
       block_comment += comment
@@ -234,37 +234,37 @@ def handle_line(index_line, line):
       index_character += 1
       continue
 
-    elif is_space(current_caracter): # espaco
+    elif is_space(current_caracter): # reconhece espaco
       # ...
       index_character += 1
       continue
 
-    elif current_caracter == '"': # cadeia de caractere
+    elif current_caracter == '"': # reconhece cadeia de caractere
       (acronym, palavra, index_character) = find_string(line, index_character)
       tokens.append((index_line, acronym, palavra))
 
-    elif is_delimiter(current_caracter): # delimitador
+    elif is_delimiter(current_caracter): # reconhece delimitador
       tokens.append((index_line, AcronymsEnum.DELIMITER.value, current_caracter))
 
-    elif(current_caracter == '!'):
+    elif(current_caracter == '!'): # reconhece exclamação como operador lógico ou relacional
       acronym = AcronymsEnum.LOGICAL_OPERATOR.value
       (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_relational_operator)
       if(compound_operator):
         acronym = AcronymsEnum.RELATIONAL_OPERATOR.value
       tokens.append((index_line, acronym, palavra))
 
-    elif is_relational_operator(current_caracter): # operador relacional
+    elif is_relational_operator(current_caracter): # reconhece operador relacional
       (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_relational_operator)
       tokens.append((index_line, AcronymsEnum.RELATIONAL_OPERATOR.value, palavra))
     
-    elif helper_logical_operator(current_caracter): # operador logico
+    elif helper_logical_operator(current_caracter): # reconhece operador lógico
       acronym = AcronymsEnum.LOGICAL_OPERATOR.value
       (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_logical_operator)
       if(not compound_operator):
         acronym = AcronymsEnum.INVALID_CHARACTER.value
       tokens.append((index_line, acronym, palavra))
 
-    elif current_caracter == '-':
+    elif current_caracter == '-': # reconhece - como operador aritmético ou representando um símbolo de número negativo
       palavra = current_caracter
       acronym = AcronymsEnum.ARITHMETIC_OPERATOR.value
       next_character = ignore_space(line, index_character+1)
@@ -273,11 +273,11 @@ def handle_line(index_line, line):
         palavra += number
       tokens.append((index_line, acronym, palavra))
 
-    elif current_caracter.isnumeric(): # numero
+    elif current_caracter.isnumeric(): # reconhece número com ou sem .
       (acronym, number, index_character) = find_number(line, index_character)
       tokens.append((index_line, acronym, number))
 
-    elif current_caracter == '/': # comentario
+    elif current_caracter == '/': # reconhece comentário de linha ou bloco
       if next_character == '/':
         (comment, index_character) = line_comment(line, index_character)
         tokens.append((index_line, AcronymsEnum.LINE_COMMENT.value, comment))
@@ -288,7 +288,7 @@ def handle_line(index_line, line):
       else:
         tokens.append((index_line, AcronymsEnum.ARITHMETIC_OPERATOR.value, current_caracter))
 
-    elif(is_valid_string_symbol(current_caracter)): # identificador
+    elif(is_valid_string_symbol(current_caracter)): # reconhece identificador
       (palavra, index_character) = find_next(line, index_character)
       if reserved_regex.match(palavra):
         tokens.append((index_line, AcronymsEnum.RESERVED_WORD.value, palavra))
@@ -299,8 +299,7 @@ def handle_line(index_line, line):
 
     print("palavra\t",palavra)
 
-    # next index
-    index_character += 1
+    index_character += 1 # next index
 
   return line
 
