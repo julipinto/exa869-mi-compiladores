@@ -224,7 +224,7 @@ def handle_line(index_line, line):
       if has_found_end:
         print("achou um comentário \n", block_comment)
         tokens.append((index_line, AcronymsEnum.BLOCK_COMMENT.value, block_comment))
-        block_comment = ""
+        reset_variable_comment()
         
       index_character += 1
       continue
@@ -303,6 +303,10 @@ def handle_line(index_line, line):
 def remove_line_garbage(line):
   return line.strip()
 
+def reset_variable_comment():
+  is_comment_block = False
+  block_comment = ""
+
 def print_console_header(path_name):
   print("**********************************************")
   print("Analisando o arquivo: ", path_name)
@@ -316,7 +320,8 @@ directory_files = [
 
 if __name__ == "__main__":
   for relative_path_name in directory_files:
-    print_console_header(relative_path_name) 
+    print_console_header(relative_path_name)
+    reset_variable_comment()
     with open(relative_path_name, encoding = 'utf-8') as file:
       for index_line, line in enumerate(file):
         line = remove_line_garbage(line)
