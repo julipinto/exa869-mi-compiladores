@@ -45,7 +45,8 @@ def is_arithmetic_operator(char):
 def is_valid_string_symbol(caractere):
   return ord(caractere) in simbolos_ascii
 
-def ignore_space(line, last_index, line_length):
+def ignore_space(line, last_index):
+  line_length = len(line)
   while last_index < line_length:
     if(not is_space(line[last_index])):
       break
@@ -79,10 +80,12 @@ def find_string(line, first_index):
 
   return (string, last_index)
 
-def find_number(line, first_index, number = ""):
+def find_number(line, first_index):
   last_index = first_index
   line_length = len(line)
   count_dot = 0
+  number = ""
+  acronym = "NRO"
 
   while last_index < line_length:
     if(line[last_index] == '.'):
@@ -94,13 +97,13 @@ def find_number(line, first_index, number = ""):
     elif(line[last_index].isnumeric()):
       number += line[last_index]
     else:
-      # Pode ser um possivel erro
+      acronym = 'NMF'
       break
     last_index += 1
 
   if(count_dot == 1 and not number[-1].isnumeric()):
-    raise Exception("Um ponto precisa ser seguido de outro número")
-  return (number, last_index)
+    acronym = 'NMF'
+  return (acronym, number, last_index)
 
 """
 Essa função vai achar o próximo conjunto de caracteres
@@ -212,15 +215,16 @@ def handle_line(index_line, line):
       
     elif line[index_character] == '-':
       palavra = line[index_character]
-      index_character = ignore_space(line, index_character+1, line_length)
-      if index_character < line_length and line[index_character].isnumeric():
-        (palavra, index_character) = find_number(line, index_character, palavra[-1])
-      else:
-        index_character -= 1
-        print('É um operador aritmetico: ', palavra[-1])
+      acronym = 'ART'
+      next_character = ignore_space(line, index_character+1)
+      if next_character < line_length and line[next_character].isnumeric():
+        (acronym, number, index_character) = find_number(line, next_character)
+        palavra += number
+      tokens.append((index_line, acronym, palavra))
 
     elif line[index_character].isnumeric(): # numero
-      (palavra, index_character) = find_number(line, index_character)
+      (acronym, number, index_character) = find_number(line, index_character)
+      tokens.append((index_line, acronym, number))
 
     elif line[index_character] == '/': # comentario
 
