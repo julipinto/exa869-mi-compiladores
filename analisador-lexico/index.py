@@ -30,6 +30,13 @@ def isArithmeticOperator(char):
 def isSymbol(caractere):
   return ord(caractere) in simbolos_ascii
 
+def ignoreSpace(line, last_index, line_length):
+  while last_index < line_length:
+    if(not isSpace(line[last_index])):
+      break
+    last_index += 1
+  return last_index
+
 def findString(line, first_index):
   """
     Dado uma linha e um index, ele verifica se a linha nesse index
@@ -57,10 +64,9 @@ def findString(line, first_index):
 
   return (string, last_index)
 
-def findNumber(line, first_index):
+def findNumber(line, first_index, number = ""):
   last_index = first_index
   line_length = len(line)
-  number = ""
   count_dot = 0
 
   while last_index < line_length:
@@ -143,10 +149,14 @@ block_comment = ""
 is_comment_block = False
 
 """
--- verificar operadores
--- melhorar funcao de delimitador
+-- verificar operadores logicos
+-- comentar todas as funcoes
+-- padronizar identificacao
+-- salvar identificao em um arquivo
+-- melhorar funcao de delimitador ?
 -- verificar numero negativo
--- verificar se ele nao atende nenhum padrao
+-- verificar se ele nao atende nenhum padrao e identificar como erro
+-- refatorar
 """
 def handleLine(linha):
     global block_comment, is_comment_block
@@ -188,20 +198,23 @@ def handleLine(linha):
           print('É um operador relacional: ', linha[index])
 
       elif linha[index] == '-':
-        if index + 1 < line_length and linha[index+1].isnumeric():
-          ...
+        palavra = linha[index]
+        index = ignoreSpace(linha, index+1, line_length)
+        if index < line_length and linha[index].isnumeric():
+          (palavra, index) = findNumber(linha, index, palavra[-1])
         else:
-          # é um operador aritmetico
-          ...
+          index -= 1
+          print('É um operador aritmetico: ', palavra[-1])
+
       elif linha[index].isnumeric(): # numero
         (palavra, index) = findNumber(linha, index)
 
-      elif linha[index] == '/':
+      elif linha[index] == '/': # comentario
 
         if index + 1 < line_length and linha[index+1] == '/':
           (comment, index) = lineComment(linha, index)
 
-        elif index + 1 < line_length and linha[index+1] == '*': # comentario
+        elif index + 1 < line_length and linha[index+1] == '*':
           is_comment_block = True
           # Ele agora vai seguir para o primeiro if para encontrar todos os comentários
           continue
