@@ -247,23 +247,21 @@ def handle_line(index_line, line):
       tokens.append((index_line, AcronymsEnum.DELIMITER.value, current_caracter))
 
     elif(current_caracter == '!'):
+      acronym = AcronymsEnum.LOGICAL_OPERATOR.value
       (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_relational_operator)
       if(compound_operator):
-        acronym = 'REL'
-      else:
-        acronym = 'LOG'
+        acronym = AcronymsEnum.RELATIONAL_OPERATOR.value
       tokens.append((index_line, acronym, palavra))
 
     elif is_relational_operator(current_caracter): # operador relacional
       (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_relational_operator)
-      tokens.append((index_line, 'REL', palavra))
+      tokens.append((index_line, AcronymsEnum.RELATIONAL_OPERATOR.value, palavra))
     
     elif helper_logical_operator(current_caracter): # operador logico
+      acronym = AcronymsEnum.LOGICAL_OPERATOR.value
       (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_logical_operator)
-      if(compound_operator):
-        acronym = 'LOG'
-      else:
-        acronym = 'CIN'
+      if(not compound_operator):
+        acronym = AcronymsEnum.INVALID_CHARACTER.value
       tokens.append((index_line, acronym, palavra))
 
     elif current_caracter == '-':
