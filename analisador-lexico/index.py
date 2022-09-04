@@ -1,6 +1,8 @@
 from asyncio.windows_events import NULL
+from logging.config import IDENTIFIER
 import os
 import re
+from enum import Enum
 
 """
 os da professora: 
@@ -19,6 +21,23 @@ os da gente:
 COB comentário de bloco
 COL comentário de linha
 """
+
+class AcronymsEnum(Enum):
+  RESERVED_WORD = "PRE"
+  IDENTIFIER = "IDE"
+  NUMBER = "NRO"
+  UNFORMED_NUMBER = "NMF"
+  DELIMITER = "DEL"
+  RELATIONAL_OPERATOR = "REL"
+  LOGICAL_OPERATOR = "LOG"
+  ARITHMETIC_OPERATOR = "ART"
+  UNFORMED_CHAIN = "CMF"
+  UNFORMED_COMMENT = "CoMF"
+  INVALID_CHARACTER = "CIN"
+  BLOCK_COMMENT = "COB"
+  LINE_COMMENT = "COL"
+
+
 tokens = []
 helper_operador_logico = ('&', '|')
 operadores_aritmeticos = ("+", "-", "*", "/", "++", "--")
@@ -90,7 +109,7 @@ def find_number(line, first_index):
   line_length = len(line)
   count_dot = 0
   number = ""
-  acronym = "NRO"
+  acronym = AcronymsEnum.NUMBER.value
 
   while last_index < line_length:
     if(line[last_index] == '.'):
@@ -102,12 +121,12 @@ def find_number(line, first_index):
     elif(line[last_index].isnumeric()):
       number += line[last_index]
     else:
-      acronym = 'NMF'
+      acronym = AcronymsEnum.UNFORMED_NUMBER.value
       break
     last_index += 1
 
   if(count_dot == 1 and not number[-1].isnumeric()):
-    acronym = 'NMF'
+    acronym = AcronymsEnum.UNFORMED_NUMBER.value
   return (acronym, number, last_index)
 
 """
@@ -197,7 +216,7 @@ def handle_line(index_line, line):
 
       if has_found_end:
         print("achou um comentário \n", block_comment)
-        tokens.append((index_line, "COB", block_comment))
+        tokens.append((index_line, AcronymsEnum.BLOCK_COMMENT.value, block_comment))
         block_comment = ""
         
       index_character += 1
@@ -243,7 +262,7 @@ def handle_line(index_line, line):
 
     elif current_caracter == '-':
       palavra = current_caracter
-      acronym = 'ART'
+      acronym = AcronymsEnum.ARITHMETIC_OPERATOR.value
       next_character = ignore_space(line, index_character+1)
       if next_character < line_length and line[next_character].isnumeric():
         (acronym, number, index_character) = find_number(line, next_character)
@@ -257,22 +276,22 @@ def handle_line(index_line, line):
     elif current_caracter == '/': # comentario
       if next_character == '/':
         (comment, index_character) = line_comment(line, index_character)
-        tokens.append((index_line, "COL", comment))
+        tokens.append((index_line, AcronymsEnum.LINE_COMMENT.value, comment))
 
       elif next_character == '*':
         is_comment_block = True
         continue # Ele agora vai seguir para o primeiro if para encontrar todos os comentários
       else:
-        tokens.append((index_line, "ART", current_caracter))
+        tokens.append((index_line, AcronymsEnum.ARITHMETIC_OPERATOR.value, current_caracter))
 
     elif(is_valid_string_symbol(current_caracter)): # identificador
       (palavra, index_character) = find_next(line, index_character)
       if reserved_regex.match(palavra):
-        tokens.append((index_line, "PRE", palavra))
+        tokens.append((index_line, AcronymsEnum.RESERVED_WORD.value, palavra))
       else:
-        tokens.append((index_line, "IDE", palavra))
+        tokens.append((index_line, AcronymsEnum.IDENTIFIER.value, palavra))
     else: # Não foi possível identificar o token
-      tokens.append((index_line, "CIN", current_caracter))
+      tokens.append((index_line, AcronymsEnum.INVALID_CHARACTER.value, current_caracter))
 
     print("palavra\t",palavra)
 
@@ -304,7 +323,7 @@ if __name__ == "__main__":
         handle_line(index_line, line)
       if is_comment_block:
         print("Bloco de comentário não foi fechado")
-        tokens.append((index_line, "CMF", block_comment))
+        tokens.append((index_line, AcronymsEnum.UNFORMED_COMMENT.value , block_comment))
 
 print(tokens)
 
