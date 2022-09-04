@@ -86,7 +86,7 @@ def find_string(line, first_index):
   while last_index < line_length:
     if(not is_valid_string_symbol(line[last_index]) and line[last_index] != '"'):
       acronym = AcronymsEnum.UNFORMED_CHAIN.value
-      # raise Exception("Caractere inválido:", line[last_index])
+
     string += line[last_index]
     if last_index > first_index and line[last_index] == '"':
       break
@@ -94,12 +94,12 @@ def find_string(line, first_index):
 
   if string[-1] != '"':
       acronym = AcronymsEnum.UNCLOSED_CHARACTER_CHAIN.value
-    #NESSE PONTO ELE ACHOU UMA STRING QUE NÃO FECHOU AS ASPAS
-    # raise Exception("String não fechou aspas")
-
   return (acronym, string, last_index)
 
 def find_number(line, first_index):
+  if not line[first_index].is_numeric():
+    raise Exception("Não é um número")
+
   last_index = first_index
   line_length = len(line)
   count_dot = 0
@@ -182,14 +182,11 @@ block_comment = ""
 is_comment_block = False
 
 """ TODO
--- verificar operadores logicos
 -- comentar todas as funcoes
--- padronizar identificacao
 -- salvar identificao em um arquivo
 -- melhorar funcao de delimitador ?
--- verificar numero negativo
 -- verificar se ele nao atende nenhum padrao e identificar como erro
--- refatorar
+-- refatorar [TA INDO]
 """
 def handle_line(index_line, line):
   global block_comment, is_comment_block
