@@ -97,7 +97,7 @@ def find_string(line, first_index):
   return (acronym, string, last_index)
 
 def find_number(line, first_index):
-  if not line[first_index].is_numeric():
+  if not line[first_index].isnumeric():
     raise Exception("Não é um número")
 
   last_index = first_index
@@ -300,7 +300,7 @@ def print_console_header(path_name):
   print("Analisando o arquivo: ", path_name)
   print("**********************************************")
 
-root = "./files"
+root = "./files/input"
 directory_files = [
   root+'/'+file_name
   for file_name in os.listdir(root) if os.path.isfile(root+'/'+file_name)
