@@ -1,6 +1,8 @@
 import os
 import re
 from enum import Enum
+
+
 class AcronymsEnum(Enum):
   RESERVED_WORD = "PRE"
   IDENTIFIER = "IDE"
@@ -227,6 +229,23 @@ def handle_line(index_line, line):
     elif is_delimiter(current_caracter): # reconhece delimitador
       tokens.append((index_line, AcronymsEnum.DELIMITER.value, current_caracter))
 
+    elif current_caracter.isnumeric(): # reconhece número com ou sem .
+      (acronym, number, index_character) = find_number(line, index_character)
+      tokens.append((index_line, acronym, number))
+
+    elif current_caracter == '-': # reconhece - como operador aritmético ou representando um símbolo de número negativo
+      palavra = current_caracter
+      acronym = AcronymsEnum.ARITHMETIC_OPERATOR.value
+      next_character = ignore_space(line, index_character+1)
+      if next_character < line_length and line[next_character].isnumeric():
+        (acronym, number, index_character) = find_number(line, next_character)
+        palavra += number
+      tokens.append((index_line, acronym, palavra))
+
+    elif is_arithmetic_operator(current_caracter): # reconhece operador aritmético
+      (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_arithmetic_operator)
+      tokens.append((index_line, AcronymsEnum.ARITHMETIC_OPERATOR.value, palavra))
+
     elif(current_caracter == '!'): # reconhece exclamação como operador lógico ou relacional
       acronym = AcronymsEnum.LOGICAL_OPERATOR.value
       (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_relational_operator)
@@ -244,19 +263,6 @@ def handle_line(index_line, line):
       if(not compound_operator):
         acronym = AcronymsEnum.INVALID_CHARACTER.value
       tokens.append((index_line, acronym, palavra))
-
-    elif current_caracter == '-': # reconhece - como operador aritmético ou representando um símbolo de número negativo
-      palavra = current_caracter
-      acronym = AcronymsEnum.ARITHMETIC_OPERATOR.value
-      next_character = ignore_space(line, index_character+1)
-      if next_character < line_length and line[next_character].isnumeric():
-        (acronym, number, index_character) = find_number(line, next_character)
-        palavra += number
-      tokens.append((index_line, acronym, palavra))
-
-    elif current_caracter.isnumeric(): # reconhece número com ou sem .
-      (acronym, number, index_character) = find_number(line, index_character)
-      tokens.append((index_line, acronym, number))
 
     elif current_caracter == '/': # reconhece comentário de linha ou bloco
       if next_character == '/':
