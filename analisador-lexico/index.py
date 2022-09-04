@@ -1,25 +1,6 @@
 import os
 import re
 from enum import Enum
-
-"""
-os da professora: 
-PRE palavra reservada
-IDE identificador
-NRO numero
-DEL delimitador 
-REL operador relacional
-LOG operador logico
-ART operador aritmetico
-CMF cadeia mal formada
-CoMF comentário mal formado
-CIN	caracter inválido
-
-os da gente: 
-COB comentário de bloco
-COL comentário de linha
-"""
-
 class AcronymsEnum(Enum):
   RESERVED_WORD = "PRE"
   IDENTIFIER = "IDE"
@@ -308,6 +289,7 @@ def remove_line_garbage(line):
   return line.strip()
 
 def reset_variable_comment():
+  global block_comment, is_comment_block
   is_comment_block = False
   block_comment = ""
 
@@ -333,19 +315,6 @@ if __name__ == "__main__":
       if is_comment_block:
         print("Bloco de comentário não foi fechado")
         tokens.append((index_line, AcronymsEnum.UNFORMED_COMMENT.value , block_comment))
+    # AQUI VAI TER QUE SALVAR O TOKEN E RESETAR PRA PASSAR PRA O PRÓXIMO ARQUIVO
 
 print(tokens)
-
-# IA ACABAR FICANDO ASSIM MAS EU REFATOREI PRA O QUE TA AI EM CIMA PRA DIMINUIR
-# if __name__ == "__main__":
-#   for _, _, directory_files in os.walk(root):
-#     for file_name in directory_files:
-#       relative_path_name = root+'/'+file_name
-#       with open(relative_path_name, encoding = 'utf-8') as file:
-#         print_header(relative_path_name) 
-#         for index_line, line in enumerate(file):
-#           line = remove_garbage_from_line(line)
-#           handle_line(index_line, line)
-      # if is_comment_block:
-      #   print("Bloco de comentário não foi fechado")
-      #   tokens.append((index_line, "CMF", block_comment))
