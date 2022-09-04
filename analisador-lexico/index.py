@@ -19,6 +19,7 @@ COB comentário de bloco
 COL comentário de linha
 """
 tokens = []
+helper_operador_logico = ('&', '|')
 operadores_aritmeticos = ("+", "-", "*", "/", "++", "--")
 operadores_relacionais = ("!=", "==", "<", ">", "<=", ">=", "=")
 operadores_logicos = ("&&", "||", "!")
@@ -41,6 +42,9 @@ def is_logical_operator(char):
 
 def is_arithmetic_operator(char):
   return char in operadores_aritmeticos
+
+def helper_logical_operator(char):
+  return char in helper_operador_logico
 
 def is_valid_string_symbol(caractere):
   return ord(caractere) in simbolos_ascii
@@ -204,6 +208,15 @@ def handle_line(index_line, line):
     elif is_delimiter(line[index_character]): # delimitador
       palavra = line[index_character]
 
+    elif(line[index_character] == '!'):
+      palavra = line[index_character]
+      if index_character + 1 < line_length and is_relational_operator(line[index_character]+line[index_character+1]):
+        index_character += 1
+        palavra = line[index_character]
+        print('É um operador relacional: ', line[index_character-1]+line[index_character])
+      else:
+        print('É um operador lógico: ', line[index_character])
+
     elif is_relational_operator(line[index_character]): # operador relacional
       palavra = line[index_character]
       if index_character + 1 < line_length and is_relational_operator(line[index_character]+line[index_character+1]):
@@ -212,7 +225,16 @@ def handle_line(index_line, line):
         print('É um operador relacional: ', line[index_character-1]+line[index_character])
       else:
         print('É um operador relacional: ', line[index_character])
-      
+    
+    elif helper_logical_operator(line[index_character]): # operador relacional
+      if index_character + 1 < line_length and is_logical_operator(line[index_character]+line[index_character+1]):
+        index_character += 1
+        palavra = line[index_character-1]
+        palavra = line[index_character]
+        print('É um operador lógico: ', line[index_character-1]+line[index_character])
+      else:
+        raise Exception("Operador lógico não encontrado: "+line[index_character])
+
     elif line[index_character] == '-':
       palavra = line[index_character]
       acronym = 'ART'
