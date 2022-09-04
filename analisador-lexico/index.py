@@ -34,6 +34,8 @@ class AcronymsEnum(Enum):
   INVALID_CHARACTER = "CIN"
   BLOCK_COMMENT = "COB"
   LINE_COMMENT = "COL"
+  CHARACTER_CHAIN = "CCH"
+  UNCLOSED_CHARACTER_CHAIN = "CCU"
 
 
 tokens = []
@@ -90,6 +92,7 @@ def find_string(line, first_index):
     são aspas, e a partir daí ele vai concatenando os caracteres
     até encontrar o fechamento das aspas.
   """
+  acronym = AcronymsEnum.CHARACTER_CHAIN.value
   if line[first_index] != '"':
     raise Exception("Não há aspas nesse index")
 
@@ -99,17 +102,19 @@ def find_string(line, first_index):
 
   while last_index < line_length:
     if(not is_valid_string_symbol(line[last_index]) and line[last_index] != '"'):
-      raise Exception("Caractere inválido:", line[last_index])
+      acronym = AcronymsEnum.UNFORMED_CHAIN.value
+      # raise Exception("Caractere inválido:", line[last_index])
     string += line[last_index]
     if last_index > first_index and line[last_index] == '"':
       break
     last_index += 1
 
   if string[-1] != '"':
+      acronym = AcronymsEnum.UNCLOSED_CHARACTER_CHAIN.value
     #NESSE PONTO ELE ACHOU UMA STRING QUE NÃO FECHOU AS ASPAS
-    raise Exception("String não fechou aspas")
+    # raise Exception("String não fechou aspas")
 
-  return (string, last_index)
+  return (acronym, string, last_index)
 
 def find_number(line, first_index):
   last_index = first_index
@@ -235,29 +240,28 @@ def handle_line(index_line, line):
       continue
 
     elif current_caracter == '"': # cadeia de caractere
-      (palavra, index_character) = find_string(line, index_character)
+      (acronym, palavra, index_character) = find_string(line, index_character)
+      tokens.append((index_line, acronym, palavra))
 
     elif is_delimiter(current_caracter): # delimitador
-      palavra = current_caracter
+      tokens.append((index_line, AcronymsEnum.DELIMITER.value, current_caracter))
 
     elif(current_caracter == '!'):
+      acronym = AcronymsEnum.LOGICAL_OPERATOR.value
       (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_relational_operator)
       if(compound_operator):
-        acronym = 'REL'
-      else:
-        acronym = 'LOG'
+        acronym = AcronymsEnum.RELATIONAL_OPERATOR.value
       tokens.append((index_line, acronym, palavra))
 
     elif is_relational_operator(current_caracter): # operador relacional
       (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_relational_operator)
-      tokens.append((index_line, 'REL', palavra))
+      tokens.append((index_line, AcronymsEnum.RELATIONAL_OPERATOR.value, palavra))
     
     elif helper_logical_operator(current_caracter): # operador logico
+      acronym = AcronymsEnum.LOGICAL_OPERATOR.value
       (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_logical_operator)
-      if(compound_operator):
-        acronym = 'LOG'
-      else:
-        acronym = 'CIN'
+      if(not compound_operator):
+        acronym = AcronymsEnum.INVALID_CHARACTER.value
       tokens.append((index_line, acronym, palavra))
 
     elif current_caracter == '-':
