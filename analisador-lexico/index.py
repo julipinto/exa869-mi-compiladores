@@ -230,18 +230,18 @@ def handle_line(index_line, line):
 
       elif index_character + 1 < line_length and line[index_character+1] == '*':
         is_comment_block = True
-        # Ele agora vai seguir para o primeiro if para encontrar todos os comentários
-        continue
+        continue # Ele agora vai seguir para o primeiro if para encontrar todos os comentários
       else:
-        # vai ser um operador
-        palavra = line[index_character] 
+        tokens.append((index_line, "ART", line[index_character]))
 
-    else:
+    elif(is_valid_string_symbol(line[index_character])): # identificador
       (palavra, index_character) = find_next(line, index_character)
       if reserved_regex.match(palavra):
         tokens.append((index_line, "PRE", palavra))
-        print('palavra reservada', palavra)
-        continue
+      else:
+        tokens.append((index_line, "IDE", palavra))
+    else: # Não foi possível identificar o token
+      tokens.append((index_line, "CIN", line[index_character]))
 
     print("palavra\t",palavra)
 
