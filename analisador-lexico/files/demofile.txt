@@ -5,6 +5,7 @@ aaaaa
 33.3    33  33.33333 33.33. 311222
 "Isso e uma string" kjadhkjsh      "outra""mais uma"
 "mais uma nova string"
+// comentario de linha
 print()
 print("isso e uma string") /*  comentário*/ /*
 
