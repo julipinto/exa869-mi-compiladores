@@ -1,8 +1,6 @@
 import os
 import re
 from enum import Enum
-from lib2to3.pgen2 import token
-
 
 class AcronymsEnum(Enum):
   RESERVED_WORD = "PRE"
