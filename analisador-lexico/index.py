@@ -30,21 +30,27 @@ reserved_regex = re.compile("(?:boolean|const|e(?:lse|xtends)|f(?:alse|unction)|
 simbolos_ascii = {i for i in range(32, 127) if i != 34}
 
 def is_space(char):
+  """ Returns true if the character is a space or tab"""
   return char == " " or char == "\t"
 
 def is_delimiter(char):
+  """ Returns true if the character is contained by the delimiter list"""
   return char in deliminadores
 
 def is_relational_operator(char):
+  """ Returns true if the character is contained by the relational operator list"""
   return char in operadores_relacionais
 
 def is_logical_operator(char):
+  """ Returns true if the character is contained by the logical operator list"""
   return char in operadores_logicos
 
 def is_arithmetic_operator(char):
+  """ Returns true if the character is contained by the arithmetic operator list"""
   return char in operadores_aritmeticos
 
 def helper_logical_operator(char):
+  """ Returns true if the character is contained by the logical operator helper list"""
   return char in helper_operador_logico
 
 def confirm_operator(line, current_index, line_length, function):
@@ -57,9 +63,11 @@ def confirm_operator(line, current_index, line_length, function):
   return (operator, current_index, compound_operator)
 
 def is_valid_string_symbol(caractere):
+  """ Returns true if the character is a valid symbol for a string, between 32 and 127 ascii regardeless of the double quote, 34""" 
   return ord(caractere) in simbolos_ascii
 
 def ignore_space(line, last_index):
+  """With the line and the first index given, it returns the next index that is not a space"""
   line_length = len(line)
   while last_index < line_length:
     if(not is_space(line[last_index])):
@@ -69,9 +77,10 @@ def ignore_space(line, last_index):
 
 def find_string(line, first_index):
   """
-    Dado uma linha e um index, ele verifica se a linha nesse index
-    são aspas, e a partir daí ele vai concatenando os caracteres
-    até encontrar o fechamento das aspas.
+    With the line and the first index given, it checks if the first character is a double quote,
+    and then it returns the concatenated string if the dople quote is closed or it gets to the
+    end of the line. If the double quote is not closed, it returns the acronym for an unclosed
+    string.
   """
   acronym = AcronymsEnum.CHARACTER_CHAIN.value
   if line[first_index] != '"':
@@ -95,6 +104,10 @@ def find_string(line, first_index):
   return (acronym, string, last_index)
 
 def find_number(line, first_index):
+  """
+    With the line and the first index given, it checks if the first character is a number,
+    and then it returns the concatenated the following numbers and at the maximum one dot.
+    """
   if not line[first_index].isnumeric():
     raise Exception("Não é um número")
 
@@ -126,10 +139,11 @@ def find_number(line, first_index):
     print("segundo")
   return (acronym, number, last_index)
 
-"""
-Essa função vai achar o próximo conjunto de caracteres
-"""
 def find_next(linha, index):
+  """
+    With the line and the first index given, it accumulates the following characters until it
+    finds a delimiter, a space the end of the line.
+  """
   final_string = index
   line_length = len(linha)
   string = ""
@@ -154,11 +168,12 @@ def line_comment(line, index):
 
 """
 TODO
--- Corrigir comentário de bloco fechando ao encontrar /*/ [CORRIGIDO AGORA TEM QUE TESTAR]
 -- Implementar erro, bloco não fechou o comentário
 """
 
 def find_end_block_comment(line, index_start):
+  """given a line and the index of the start of the block comment, it accumulates the following 
+   until it finds the end of the block comment or the end of the line"""
   line_length = len(line)
   index_end = index_start
   comment = ""
@@ -185,7 +200,7 @@ is_comment_block = False
 index_block_comment = 0
 
 """ TODO
--- comentar todas as funcoes
+-- comentar todas as funcoes [ainda falta algumas]
 -- melhorar funcao de delimitador ?
 -- refatorar [TA INDO]
 """
@@ -308,7 +323,7 @@ root = "./files/input"
 directory_files = [
   root+'/'+file_name
   for file_name in os.listdir(root) if os.path.isfile(root+'/'+file_name)
-]
+] 
 
 if __name__ == "__main__":
   for relative_path_name in directory_files:
