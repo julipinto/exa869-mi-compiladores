@@ -1,9 +1,10 @@
-0 CCH ""
-0 CCH ""
+0 CAC ""
+0 CAC ""
 0 REL ==
 0 REL =
 0 ART -
 0 NRO -2
+0 ART -
 0 NRO 3
 0 LOG !
 1 IDE b
@@ -13,28 +14,41 @@
 2 IDE c
 2 REL !=
 2 LOG ||
+3 IDE variavel1
+3 ART -
+3 IDE variavel2
+4 IDE variavel1
+4 ART -
+4 NRO 3
+5 NRO 3
+5 ART -
+5 IDE variavel2
+6 IDE variavel1
+6 ART --
+6 IDE variavel2
+7 IDE variavel1
+7 ART ++
+7 IDE variavel2
+8 IDE aaaaa
+9 NRO 33.3
+9 ART --
+9 NRO 33
+9 NRO 33.33333
+9 NRO 33.33
+9 NRO 311222
+10 CAC "Isso e uma string"
+10 IDE kjadhkjsh
+10 CAC "outra"
+10 CAC "mais uma"
+11 CAC "mais uma nova string"
+13 PRE print
+13 DEL (
+13 DEL )
+14 PRE print
+14 DEL (
+14 CAC "isso e uma string"
+14 DEL )
+18 ART /
+
 2 CIN |
-3 IDE aaaaa
-4 NRO 33.3
-4 NRO 33
-4 NRO 33.33333
-4 NRO 33.33
-4 NRO 311222
-5 CCH "Isso e uma string"
-5 IDE kjadhkjsh
-5 CCH "outra"
-5 CCH "mais uma"
-6 CCH "mais uma nova string"
-7 COL // comentario de linha
-8 PRE print
-8 DEL (
-8 DEL )
-9 PRE print
-9 DEL (
-9 CCH "isso e uma string"
-9 DEL )
-9 COB /*  comentário*/
-9 COB /*comentáaaaario*/
-13 COB /*/*/
-13 ART /
-13 CoMF /*/
+18 CoMF /*/

@@ -1,3 +1,4 @@
+from operator import index
 import os
 import re
 from enum import Enum
@@ -6,7 +7,6 @@ class AcronymsEnum(Enum):
   RESERVED_WORD = "PRE"
   IDENTIFIER = "IDE"
   NUMBER = "NRO"
-  UNFORMED_NUMBER = "NMF"
   DELIMITER = "DEL"
   RELATIONAL_OPERATOR = "REL"
   LOGICAL_OPERATOR = "LOG"
@@ -14,13 +14,11 @@ class AcronymsEnum(Enum):
   UNFORMED_CHAIN = "CMF"
   UNFORMED_COMMENT = "CoMF"
   INVALID_CHARACTER = "CIN"
-  BLOCK_COMMENT = "COB"
-  LINE_COMMENT = "COL"
-  CHARACTER_CHAIN = "CCH"
-  UNCLOSED_CHARACTER_CHAIN = "CCU"
+  CHARACTER_CHAIN = "CAC"
 
 
 tokens = []
+tokens_errors = []
 helper_operador_logico = ('&', '|')
 operadores_aritmeticos = ("+", "-", "*", "/", "++", "--")
 operadores_relacionais = ("!=", "==", "<", ">", "<=", ">=", "=")
@@ -100,7 +98,7 @@ def find_string(line, first_index):
     last_index += 1
 
   if string[-1] != '"':
-      acronym = AcronymsEnum.UNCLOSED_CHARACTER_CHAIN.value
+      acronym = AcronymsEnum.UNFORMED_CHAIN.value
   return (acronym, string, last_index)
 
 def find_number(line, first_index):
@@ -127,16 +125,17 @@ def find_number(line, first_index):
         break
     elif(current_number.isnumeric()):
       number += current_number
-    elif(is_space(current_number)):
+    elif(is_space(current_number) or is_delimiter(current_number) or is_relational_operator(current_number) or is_logical_operator(current_number) or is_arithmetic_operator(current_number)):
+      last_index -= 1
       break
     else:
-      acronym = AcronymsEnum.UNFORMED_NUMBER.value
+      acronym = AcronymsEnum.UNFORMED_CHAIN.value
+      print('a')
 
     last_index += 1
 
   if(count_dot == 1 and not number[-1].isnumeric()):
-    acronym = AcronymsEnum.UNFORMED_NUMBER.value
-    print("segundo")
+    acronym = AcronymsEnum.UNFORMED_CHAIN.value
   return (acronym, number, last_index)
 
 def find_next(linha, index):
@@ -199,11 +198,6 @@ block_comment = ""
 is_comment_block = False
 index_block_comment = 0
 
-""" TODO
--- comentar todas as funcoes [ainda falta algumas]
--- melhorar funcao de delimitador ?
--- refatorar [TA INDO]
-"""
 def handle_line(index_line, line):
   global block_comment, is_comment_block, index_block_comment
   line_length = len(line)
@@ -223,7 +217,7 @@ def handle_line(index_line, line):
       block_comment += comment
 
       if has_found_end:
-        tokens.append((index_block_comment, AcronymsEnum.BLOCK_COMMENT.value, block_comment))
+        # tokens.append((index_block_comment, AcronymsEnum.BLOCK_COMMENT.value, block_comment))
         reset_variable_comment()
         
     elif is_space(current_caracter): # reconhece espaco
@@ -232,7 +226,7 @@ def handle_line(index_line, line):
     elif current_caracter == '/': # reconhece comentário de linha ou bloco
       if next_character == '/':
         (comment, index_character) = line_comment(line, index_character)
-        tokens.append((index_line, AcronymsEnum.LINE_COMMENT.value, comment))
+        # tokens.append((index_line, AcronymsEnum.LINE_COMMENT.value, comment))
 
       elif next_character == '*':
         index_block_comment = index_line
@@ -243,23 +237,42 @@ def handle_line(index_line, line):
 
     elif current_caracter == '"': # reconhece cadeia de caractere
       (acronym, palavra, index_character) = find_string(line, index_character)
-      tokens.append((index_line, acronym, palavra))
+      if(acronym == AcronymsEnum.UNFORMED_CHAIN.value):
+        tokens_errors.append((index_line, acronym, palavra))
+      else:
+        tokens.append((index_line, acronym, palavra))
 
     elif is_delimiter(current_caracter): # reconhece delimitador
       tokens.append((index_line, AcronymsEnum.DELIMITER.value, current_caracter))
 
     elif current_caracter.isnumeric(): # reconhece número com ou sem .
       (acronym, number, index_character) = find_number(line, index_character)
-      tokens.append((index_line, acronym, number))
+      if(acronym == AcronymsEnum.UNFORMED_CHAIN.value):
+        tokens_errors.append((index_line, acronym, number))
+      else:
+        tokens.append((index_line, acronym, number))
 
     elif current_caracter == '-': # reconhece - como operador aritmético ou representando um símbolo de número negativo
-      palavra = current_caracter
       acronym = AcronymsEnum.ARITHMETIC_OPERATOR.value
-      next_character = ignore_space(line, index_character+1)
-      if next_character < line_length and line[next_character].isnumeric():
-        (acronym, number, index_character) = find_number(line, next_character)
-        palavra += number
-      tokens.append((index_line, acronym, palavra))
+      palavra = current_caracter
+
+      if next_character == '-':
+        palavra += next_character
+        index_character += 1
+
+      else:
+        index_next_character = ignore_space(line, index_character+1)
+      
+        if index_next_character < line_length and line[index_next_character].isnumeric():
+          (index_line_token, acronym_token, token) = tokens[-1]
+          if (index_line_token != index_line or not
+              (acronym_token == AcronymsEnum.NUMBER.value or acronym_token == AcronymsEnum.IDENTIFIER.value)):
+              (acronym, number, index_character) = find_number(line, index_next_character)
+              palavra += number
+      if(acronym == AcronymsEnum.UNFORMED_CHAIN.value):
+        tokens_errors.append((index_line, acronym, palavra))
+      else:
+        tokens.append((index_line, acronym, palavra))
 
     elif is_arithmetic_operator(current_caracter): # reconhece operador aritmético
       (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_arithmetic_operator)
@@ -281,8 +294,11 @@ def handle_line(index_line, line):
       (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_logical_operator)
       if(not compound_operator):
         acronym = AcronymsEnum.INVALID_CHARACTER.value
-      tokens.append((index_line, acronym, palavra))
+        tokens_errors.append((index_line, acronym, palavra))
+      else:
+        tokens.append((index_line, acronym, palavra))
 
+    # ELE SÓ PODE SER NÚMERO, LETRA OU _
     elif(is_valid_string_symbol(current_caracter)): # reconhece identificador
       (palavra, index_character) = find_next(line, index_character)
       acronym = AcronymsEnum.IDENTIFIER.value
@@ -292,7 +308,7 @@ def handle_line(index_line, line):
       continue
 
     else: # Não foi possível identificar o token
-      tokens.append((index_line, AcronymsEnum.INVALID_CHARACTER.value, current_caracter))
+      tokens_errors.append((index_line, AcronymsEnum.INVALID_CHARACTER.value, current_caracter))
 
     index_character += 1 # next index
 
@@ -317,6 +333,13 @@ def salvar_analise_arquivo(name_file, tokens):
   for token in tokens:
     str_token = str(token[0]) + " " + str(token[1]) + " " + str(token[2])
     arquivo.write(str_token+'\n')
+
+  arquivo.write('\n')
+  
+  for erro  in tokens_errors:
+    str_erro = str(erro[0]) + " " + str(erro[1]) + " " + str(erro[2])
+    arquivo.write(str_erro+'\n')
+
   arquivo.close()
 
 root = "./files/input"
@@ -334,6 +357,7 @@ if __name__ == "__main__":
         line = remove_line_garbage(line)
         handle_line(index_line, line)
       if is_comment_block:
-        tokens.append((index_line, AcronymsEnum.UNFORMED_COMMENT.value , block_comment))
+        tokens_errors.append((index_line, AcronymsEnum.UNFORMED_COMMENT.value , block_comment))
     salvar_analise_arquivo(relative_path_name, tokens)
     tokens = []
+    tokens_errors = []
