@@ -16,6 +16,9 @@ class AcronymsEnum(Enum):
   UNFORMED_COMMENT = "CoMF"
   INVALID_CHARACTER = "CIN"
   CHARACTER_CHAIN = "CAC"
+  UNFORMED_TOKEN = "TMF"
+  UNFORMED_IDENTIFIER = "IMF"
+  UNFORMED_NUMBER = "NMF"
 
 
 tokens = []
@@ -181,9 +184,7 @@ def find_identifier(linha, index):
     if current_character in deliminadores: 
       break 
     if not current_character.isalpha() and not current_character.isnumeric() and current_character != '_':     
-      print(current_character)
-      print('aaaaaa')
-      acronym = AcronymsEnum.UNFORMED_CHAIN.value
+      acronym = AcronymsEnum.UNFORMED_IDENTIFIER.value
     string += linha[final_string] 
     final_string += 1 
   return (acronym, string, final_string)
@@ -337,13 +338,13 @@ def handle_line(index_line, line):
       (acronym, palavra, index_character) = find_identifier(line, index_character) 
       if reserved_regex.match(palavra): 
         acronym = AcronymsEnum.RESERVED_WORD.value
-      if(acronym == AcronymsEnum.UNFORMED_CHAIN.value): 
+      if(acronym == AcronymsEnum.UNFORMED_IDENTIFIER.value): 
         tokens_errors.append((index_line, acronym, palavra)) 
       else: 
         tokens.append((index_line, acronym, palavra))
       continue
     else: 
-      acronym = AcronymsEnum.UNFORMED_CHAIN.value
+      acronym = AcronymsEnum.UNFORMED_TOKEN.value
       tokens_errors.append((index_line, acronym, current_caracter))
 
     index_character += 1 # next index
