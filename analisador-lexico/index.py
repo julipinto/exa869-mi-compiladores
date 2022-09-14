@@ -126,20 +126,21 @@ def find_number(line, first_index):
         count_dot = 1
         number += current_number
       else:
-        break
+        count_dot += 1
+        number += current_number
+        acronym = AcronymsEnum.UNFORMED_NUMBER.value
     elif(current_number.isnumeric()):
       number += current_number
     elif(is_space(current_number) or is_delimiter(current_number) or is_relational_operator(current_number) or is_logical_operator(current_number) or is_arithmetic_operator(current_number)):
       last_index -= 1
       break
     else:
-      acronym = AcronymsEnum.UNFORMED_CHAIN.value
-      print('a')
+      acronym = AcronymsEnum.UNFORMED_NUMBER.value
 
     last_index += 1
 
   if(count_dot == 1 and not number[-1].isnumeric()):
-    acronym = AcronymsEnum.UNFORMED_CHAIN.value
+    acronym = AcronymsEnum.UNFORMED_NUMBER.value
   return (acronym, number, last_index)
 
 # def find_next(linha, index):
@@ -174,7 +175,7 @@ def is_allowed_identifier_characater(char, plain = False):
   allowed_symbol = "_"
   if plain:
     return char in allowed_alphabet
-  return char in allowed_alphabet or char in allowed_numbers or char in allowed_symbol
+  return char in allowed_alphabet or char in allowed_numbers or char is allowed_symbol
 
 
 def find_identifier(linha, index):
@@ -192,8 +193,8 @@ def find_identifier(linha, index):
     
     if current_character in deliminadores: 
       break 
-    if not is_allowed_identifier_characater(current_character):     
-      acronym = AcronymsEnum.UNFORMED_CHAIN.value
+    if not is_allowed_identifier_characater(current_character):  
+      acronym = AcronymsEnum.UNFORMED_IDENTIFIER.value
     string += linha[final_string] 
     final_string += 1 
   return (acronym, string, final_string)
@@ -281,7 +282,7 @@ def handle_line(index_line, line):
 
     elif current_caracter.isnumeric(): # reconhece número com ou sem .
       (acronym, number, index_character) = find_number(line, index_character)
-      if(acronym == AcronymsEnum.UNFORMED_CHAIN.value):
+      if(acronym == AcronymsEnum.UNFORMED_NUMBER.value):
         tokens_errors.append((index_line, acronym, number))
       else:
         tokens.append((index_line, acronym, number))
@@ -303,7 +304,7 @@ def handle_line(index_line, line):
               (acronym_token == AcronymsEnum.NUMBER.value or acronym_token == AcronymsEnum.IDENTIFIER.value)):
               (acronym, number, index_character) = find_number(line, index_next_character)
               palavra += number
-      if(acronym == AcronymsEnum.UNFORMED_CHAIN.value):
+      if(acronym == AcronymsEnum.UNFORMED_NUMBER.value):
         tokens_errors.append((index_line, acronym, palavra))
       else:
         tokens.append((index_line, acronym, palavra))
