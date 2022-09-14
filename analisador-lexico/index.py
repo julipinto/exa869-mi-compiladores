@@ -1,7 +1,8 @@
-from operator import index
 import os
 import re
 from enum import Enum
+from operator import index
+
 
 class AcronymsEnum(Enum):
   RESERVED_WORD = "PRE"
@@ -138,22 +139,22 @@ def find_number(line, first_index):
     acronym = AcronymsEnum.UNFORMED_CHAIN.value
   return (acronym, number, last_index)
 
-def find_next(linha, index):
-  """
-    With the line and the first index given, it accumulates the following characters until it
-    finds a delimiter, a space the end of the line.
-  """
-  final_string = index
-  line_length = len(linha)
-  string = ""
+# def find_next(linha, index):
+#   """
+#     With the line and the first index given, it accumulates the following characters until it
+#     finds a delimiter, a space the end of the line.
+#   """
+#   final_string = index
+#   line_length = len(linha)
+#   string = ""
 
-  while final_string < line_length:
-    if final_string >= index and linha[final_string] in deliminadores:
-      break
-    string += linha[final_string]
-    final_string += 1
+#   while final_string < line_length:
+#     if final_string >= index and linha[final_string] in deliminadores:
+#       break
+#     string += linha[final_string]
+#     final_string += 1
 
-  return (string, final_string)
+#   return (string, final_string)
 
 def line_comment(line, index):
   if line[index] != '/' and line[index+1] != '/':
@@ -164,6 +165,29 @@ def line_comment(line, index):
 
   return (comment, index_end)
 
+def find_identifier(linha, index):
+  """ 
+  With the line and the first index given, it accumulates the following characters until it 
+  finds a delimiter, a space the end of the line. 
+  """ 
+  acronym = AcronymsEnum.IDENTIFIER.value
+  final_string = index 
+  line_length = len(linha) 
+  string = "" 
+  
+  while final_string < line_length: 
+    current_character = linha[final_string]
+    
+    if current_character in deliminadores: 
+      break 
+    if not current_character.isalpha() and not current_character.isnumeric() and current_character != '_':     
+      print(current_character)
+      print('aaaaaa')
+      acronym = AcronymsEnum.UNFORMED_CHAIN.value
+    string += linha[final_string] 
+    final_string += 1 
+  return (acronym, string, final_string)
+
 
 """
 TODO
@@ -172,7 +196,7 @@ TODO
 
 def find_end_block_comment(line, index_start):
   """given a line and the index of the start of the block comment, it accumulates the following 
-   until it finds the end of the block comment or the end of the line"""
+  until it finds the end of the block comment or the end of the line"""
   line_length = len(line)
   index_end = index_start
   comment = ""
@@ -299,16 +323,28 @@ def handle_line(index_line, line):
         tokens.append((index_line, acronym, palavra))
 
     # ELE SÓ PODE SER NÚMERO, LETRA OU _
-    elif(is_valid_string_symbol(current_caracter)): # reconhece identificador
-      (palavra, index_character) = find_next(line, index_character)
-      acronym = AcronymsEnum.IDENTIFIER.value
-      if reserved_regex.match(palavra):
-        acronym = AcronymsEnum.RESERVED_WORD.value
-      tokens.append((index_line, acronym, palavra))
-      continue
+    # elif(is_valid_string_symbol(current_caracter)): # reconhece identificador
+    #   (acronym, palavra, index_character) = find_identifier(line, index_character)
+    #   acronym = AcronymsEnum.IDENTIFIER.value
+    #   if reserved_regex.match(palavra):
+    #     acronym = AcronymsEnum.RESERVED_WORD.value
+    #   tokens.append((index_line, acronym, palavra))
+    #   continue
 
-    else: # Não foi possível identificar o token
-      tokens_errors.append((index_line, AcronymsEnum.INVALID_CHARACTER.value, current_caracter))
+    # else: # Não foi possível identificar o token
+    #   tokens_errors.append((index_line, AcronymsEnum.INVALID_CHARACTER.value, current_caracter))
+    elif(current_caracter.isalpha()): # reconhece identificador 
+      (acronym, palavra, index_character) = find_identifier(line, index_character) 
+      if reserved_regex.match(palavra): 
+        acronym = AcronymsEnum.RESERVED_WORD.value
+      if(acronym == AcronymsEnum.UNFORMED_CHAIN.value): 
+        tokens_errors.append((index_line, acronym, palavra)) 
+      else: 
+        tokens.append((index_line, acronym, palavra))
+      continue
+    else: 
+      acronym = AcronymsEnum.UNFORMED_CHAIN.value
+      tokens_errors.append((index_line, acronym, current_caracter))
 
     index_character += 1 # next index
 
