@@ -7,29 +7,28 @@
 0 ART -
 0 NRO 3
 0 LOG !
-1 IDE b
+1 CMF b
 1 LOG !
 1 LOG !
 1 LOG &&
-2 IDE c
+2 CMF c
 2 REL !=
 2 LOG ||
-3 IDE variavel1
+3 CMF variavel1
 3 ART -
-3 IDE variavel2
-4 IDE variavel1
-4 ART -
-4 NRO 3
+3 CMF variavel2
+4 CMF variavel1
+4 NRO -3
 5 NRO 3
 5 ART -
-5 IDE variavel2
-6 IDE variavel1
+5 CMF variavel2
+6 CMF variavel1
 6 ART --
-6 IDE variavel2
-7 IDE variavel1
+6 CMF variavel2
+7 CMF variavel1
 7 ART ++
-7 IDE variavel2
-8 IDE aaaaa
+7 CMF variavel2
+8 CMF aaaaa
 9 NRO 33.3
 9 ART --
 9 NRO 33
@@ -37,15 +36,11 @@
 9 NRO 33.33
 9 NRO 311222
 10 CAC "Isso e uma string"
-10 IDE kjadhkjsh
+10 CMF kjadhkjsh
 10 CAC "outra"
 10 CAC "mais uma"
 11 CAC "mais uma nova string"
-13 PRE print
-13 DEL (
 13 DEL )
-14 PRE print
-14 DEL (
 14 CAC "isso e uma string"
 14 DEL )
 18 ART /

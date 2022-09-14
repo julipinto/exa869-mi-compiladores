@@ -1,12 +1,10 @@
 0 IDE exemplo
-0 IDE teste
 0 DEL ;
 2 PRE real
 2 IDE f
 2 REL =
 2 NRO 3.0
 2 DEL ;
-3 IDE @
 4 IDE texto
 4 IDE msg
 4 REL =
@@ -25,10 +23,12 @@
 7 DEL (
 8 PRE print
 8 DEL (
-8 CAC "mens@gem"
 8 DEL )
 8 DEL ;
 
+0 IMF tes@te
+3 TMF @
 4 CMF "teste
 7 CMF "mensagem);
+8 CMF "mensÇgem"
 13 CoMF /* exa869 mi processadores delinguagem de programacao
