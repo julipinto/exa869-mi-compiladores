@@ -135,6 +135,7 @@ def find_number(line, first_index):
       last_index -= 1
       break
     else:
+      number += current_number
       acronym = AcronymsEnum.UNFORMED_NUMBER.value
 
     last_index += 1
@@ -191,7 +192,7 @@ def find_identifier(linha, index):
   while final_string < line_length: 
     current_character = linha[final_string]
     
-    if current_character in deliminadores: 
+    if is_delimiter(current_character) or is_relational_operator(current_character) or is_logical_operator(current_character) or is_arithmetic_operator(current_character): 
       break 
     if not is_allowed_identifier_characater(current_character):  
       acronym = AcronymsEnum.UNFORMED_IDENTIFIER.value
