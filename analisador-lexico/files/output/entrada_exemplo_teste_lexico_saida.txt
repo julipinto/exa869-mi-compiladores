@@ -26,8 +26,13 @@
 8 DEL )
 8 DEL ;
 
+<<<<<<< HEAD
 0 IMF tes@te
 3 TMF @
+=======
+0 CMF teÇste
+3 CMF @
+>>>>>>> 98c62b8de682c1b0867926b906dc9d927e75983c
 4 CMF "teste
 7 CMF "mensagem);
 8 CMF "mensÇgem"

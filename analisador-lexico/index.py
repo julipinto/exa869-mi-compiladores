@@ -168,6 +168,15 @@ def line_comment(line, index):
 
   return (comment, index_end)
 
+def is_allowed_identifier_characater(char, plain = False):
+  allowed_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  allowed_numbers = "0123456789"
+  allowed_symbol = "_"
+  if plain:
+    return char in allowed_alphabet
+  return char in allowed_alphabet or char in allowed_numbers or char in allowed_symbol
+
+
 def find_identifier(linha, index):
   """ 
   With the line and the first index given, it accumulates the following characters until it 
@@ -183,8 +192,8 @@ def find_identifier(linha, index):
     
     if current_character in deliminadores: 
       break 
-    if not current_character.isalpha() and not current_character.isnumeric() and current_character != '_':     
-      acronym = AcronymsEnum.UNFORMED_IDENTIFIER.value
+    if not is_allowed_identifier_characater(current_character):     
+      acronym = AcronymsEnum.UNFORMED_CHAIN.value
     string += linha[final_string] 
     final_string += 1 
   return (acronym, string, final_string)
@@ -334,7 +343,7 @@ def handle_line(index_line, line):
 
     # else: # Não foi possível identificar o token
     #   tokens_errors.append((index_line, AcronymsEnum.INVALID_CHARACTER.value, current_caracter))
-    elif(current_caracter.isalpha()): # reconhece identificador 
+    elif(is_allowed_identifier_characater(current_caracter, True)): # reconhece identificador 
       (acronym, palavra, index_character) = find_identifier(line, index_character) 
       if reserved_regex.match(palavra): 
         acronym = AcronymsEnum.RESERVED_WORD.value

@@ -1,4 +1,4 @@
-exemplo teste;
+exemplo teÇste;
 
 real f = 3.0;
 @
