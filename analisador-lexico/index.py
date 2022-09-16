@@ -14,7 +14,6 @@ class AcronymsEnum(Enum):
   ARITHMETIC_OPERATOR = "ART"
   UNFORMED_CHAIN = "CMF"
   UNFORMED_COMMENT = "CoMF"
-  INVALID_CHARACTER = "CIN"
   CHARACTER_CHAIN = "CAC"
   UNFORMED_TOKEN = "TMF"
   UNFORMED_IDENTIFIER = "IMF"
@@ -101,7 +100,7 @@ def find_string(line, first_index):
       break
     last_index += 1
 
-  if string[-1] != '"':
+  if string[-1] != '"' or len(string) < 2:
       acronym = AcronymsEnum.UNFORMED_CHAIN.value
   return (acronym, string, last_index)
 
@@ -126,40 +125,27 @@ def find_number(line, first_index):
         count_dot = 1
         number += current_number
       else:
-        count_dot += 1
-        number += current_number
-        acronym = AcronymsEnum.UNFORMED_NUMBER.value
+        last_index -= 1
+        break
+        # count_dot += 1
+        # number += current_number
+        # acronym = AcronymsEnum.UNFORMED_NUMBER.value
     elif(current_number.isnumeric()):
       number += current_number
-    elif(is_space(current_number) or is_delimiter(current_number) or is_relational_operator(current_number) or is_logical_operator(current_number) or is_arithmetic_operator(current_number)):
+    # elif(is_space(current_number) or is_delimiter(current_number) or is_relational_operator(current_number) or is_logical_operator(current_number) or is_arithmetic_operator(current_number)):
+    #   last_index -= 1
+    #   break
+    else:
       last_index -= 1
       break
-    else:
-      number += current_number
-      acronym = AcronymsEnum.UNFORMED_NUMBER.value
+      # number += current_number
+      # acronym = AcronymsEnum.UNFORMED_NUMBER.value
 
     last_index += 1
 
   if(count_dot == 1 and not number[-1].isnumeric()):
     acronym = AcronymsEnum.UNFORMED_NUMBER.value
   return (acronym, number, last_index)
-
-# def find_next(linha, index):
-#   """
-#     With the line and the first index given, it accumulates the following characters until it
-#     finds a delimiter, a space the end of the line.
-#   """
-#   final_string = index
-#   line_length = len(linha)
-#   string = ""
-
-#   while final_string < line_length:
-#     if final_string >= index and linha[final_string] in deliminadores:
-#       break
-#     string += linha[final_string]
-#     final_string += 1
-
-#   return (string, final_string)
 
 def line_comment(line, index):
   if line[index] != '/' and line[index+1] != '/':
@@ -192,9 +178,12 @@ def find_identifier(linha, index):
   while final_string < line_length: 
     current_character = linha[final_string]
     
-    if is_delimiter(current_character) or is_relational_operator(current_character) or is_logical_operator(current_character) or is_arithmetic_operator(current_character): 
+    if is_delimiter(current_character) or is_relational_operator(current_character) or is_logical_operator(current_character) or is_arithmetic_operator(current_character) or current_character == "\"": 
+    # if current_character in deliminadores: 
       break 
+
     if not is_allowed_identifier_characater(current_character):  
+      # break
       acronym = AcronymsEnum.UNFORMED_IDENTIFIER.value
     string += linha[final_string] 
     final_string += 1 
@@ -329,22 +318,11 @@ def handle_line(index_line, line):
       acronym = AcronymsEnum.LOGICAL_OPERATOR.value
       (palavra, index_character, compound_operator) = confirm_operator(line, index_character, line_length, is_logical_operator)
       if(not compound_operator):
-        acronym = AcronymsEnum.INVALID_CHARACTER.value
+        acronym = AcronymsEnum.UNFORMED_TOKEN.value
         tokens_errors.append((index_line, acronym, palavra))
       else:
         tokens.append((index_line, acronym, palavra))
 
-    # ELE SÓ PODE SER NÚMERO, LETRA OU _
-    # elif(is_valid_string_symbol(current_caracter)): # reconhece identificador
-    #   (acronym, palavra, index_character) = find_identifier(line, index_character)
-    #   acronym = AcronymsEnum.IDENTIFIER.value
-    #   if reserved_regex.match(palavra):
-    #     acronym = AcronymsEnum.RESERVED_WORD.value
-    #   tokens.append((index_line, acronym, palavra))
-    #   continue
-
-    # else: # Não foi possível identificar o token
-    #   tokens_errors.append((index_line, AcronymsEnum.INVALID_CHARACTER.value, current_caracter))
     elif(is_allowed_identifier_characater(current_caracter, True)): # reconhece identificador 
       (acronym, palavra, index_character) = find_identifier(line, index_character) 
       if reserved_regex.match(palavra): 
@@ -379,13 +357,21 @@ def salvar_analise_arquivo(name_file, tokens):
   name_file = (os.path.splitext(name_file)[0]).replace('input', 'output')+'_saida.txt'
   arquivo = open(name_file, 'w+', encoding="utf-8")
   for token in tokens:
-    str_token = str(token[0]) + " " + str(token[1]) + " " + str(token[2])
+    line_number = str(token[0]+1)
+    if len(line_number) == 1:
+      line_number = '0'+line_number
+
+    str_token = line_number + " " + str(token[1]) + " " + str(token[2])
     arquivo.write(str_token+'\n')
 
   arquivo.write('\n')
   
   for erro  in tokens_errors:
-    str_erro = str(erro[0]) + " " + str(erro[1]) + " " + str(erro[2])
+    line_number = str(erro[0]+1)
+    if len(line_number) == 1:
+      line_number = '0'+line_number
+
+    str_erro = line_number + " " + str(erro[1]) + " " + str(erro[2])
     arquivo.write(str_erro+'\n')
 
   arquivo.close()

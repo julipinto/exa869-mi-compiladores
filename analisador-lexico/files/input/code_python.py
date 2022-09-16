@@ -1,1 +1,0 @@
-print("màis uma nova string")

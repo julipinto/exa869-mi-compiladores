@@ -1,3 +1,0 @@
-0 DEL )
-
-0 CMF "màis uma nova string"
