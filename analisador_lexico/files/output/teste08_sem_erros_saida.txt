@@ -1,0 +1,5 @@
+26 PRE print
+26 DEL (
+26 IDE cadeia
+26 DEL )
+

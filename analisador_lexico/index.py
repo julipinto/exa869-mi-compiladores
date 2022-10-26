@@ -23,7 +23,7 @@ class AcronymsEnum(Enum):
 tokens = []
 tokens_errors = []
 helper_operador_logico = ('&', '|')
-operadores_aritmeticos = ("+", "-", "*", "/", "++", "--")
+operadores_aritmeticos = ('+' , '-' , '*' , '/' , '++' , '--')
 operadores_relacionais = ("!=", "==", "<", ">", "<=", ">=", "=")
 operadores_logicos = ("&&", "||", "!")
 deliminadores = (";", ",", "(", ")", "[", "]", "{", "}", ".", " ", "\t")
@@ -376,13 +376,14 @@ def salvar_analise_arquivo(name_file, tokens):
 
   arquivo.close()
 
-root = "./files/input"
+#root = "./files/input"
+root = os.path.abspath("analisador_lexico/files/input")
 directory_files = [
   root+'/'+file_name
   for file_name in os.listdir(root) if os.path.isfile(root+'/'+file_name)
 ] 
 
-if __name__ == "__main__":
+def run_lexical(): 
   for relative_path_name in directory_files:
     print_console_header(relative_path_name)
     reset_variable_comment()
@@ -393,5 +394,10 @@ if __name__ == "__main__":
       if is_comment_block:
         tokens_errors.append((index_line, AcronymsEnum.UNFORMED_COMMENT.value , block_comment))
     salvar_analise_arquivo(relative_path_name, tokens)
+    return tokens
+
+if __name__ == "__main__":
+    run_lexical()
     tokens = []
     tokens_errors = []
+
