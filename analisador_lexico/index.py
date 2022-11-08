@@ -377,9 +377,12 @@ def salvar_analise_arquivo(name_file, tokens):
   arquivo.close()
 
 #root = "./files/input"
-root = os.path.abspath("analisador_lexico/files/input")
+root = os.path.dirname(os.path.realpath(__file__))+'\\files\\input'
+# root = os.path.abspath("analisador_lexico/files/input")
+# cwd = os.getcwd()+'analisador_lexico\files\input'
+# print(os.path.dirname(os.path.realpath(__file__)))
 directory_files = [
-  root+'/'+file_name
+  root+'\\'+file_name
   for file_name in os.listdir(root) if os.path.isfile(root+'/'+file_name)
 ] 
 

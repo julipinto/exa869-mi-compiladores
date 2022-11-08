@@ -23,4 +23,6 @@ procedure start {  // comeca aqui o programa principal
  
 } */
 
-print(cadeia)
+//print(cadeia)
+
+read(teste);
