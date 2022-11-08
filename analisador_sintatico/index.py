@@ -1,15 +1,22 @@
 import sys
-sys.path.append('C:\\Users\\nana-\\Documents\\github\\Juliapp\\exa869-mi-compiladores')
 
-from analisador_lexico.index import run_lexical, AcronymsEnum
+sys.path.append('C:\\Users\\adlla\\Documents\\GitHub\\exa869-mi-compiladores')
+
+from analisador_lexico.index import AcronymsEnum, run_lexical
+
 # import ./analisador_lexico/index.py
 #from index import run_lexical
 
 tokens = run_lexical()
 
+def is_type(token):
+  return token == 'int' | token == 'real' | token == 'boolean' | token == 'string'
+
 def is_printable(acronym, lexeme):
   return acronym == AcronymsEnum.IDENTIFIER.value or acronym == AcronymsEnum.CHARACTER_CHAIN.value
 
+def is_read(acronym):
+  return acronym == AcronymsEnum.IDENTIFIER.value
 
 def validate_grammar_print(index_init):
   is_print = tokens[index_init][2] == 'print'
@@ -23,6 +30,24 @@ def validate_grammar_print(index_init):
 
   ## O 3 É ARBITRÁRIO, MODIFICAR COM O CONTEÚDO DO PRINT
   return is_print and is_open and is_print and is_close, index_init + 3
+
+'''
+  Valida a gramática do READ.
+'''
+def validate_grammar_read(index_init):
+  correct_grammar = False
+  if(tokens[index_init][2] == 'read'):
+    index_init = index_init + 1
+    if(tokens[index_init][2] == '('):
+      index_init = index_init + 1
+      if(is_read(tokens[index_init][1])):
+        index_init = index_init + 1
+        if(tokens[index_init][2] == ')'):
+          index_init = index_init + 1
+          if(tokens[index_init][2] == ';'):
+            index_init = index_init + 1
+            correct_grammar = True
+  return correct_grammar, index_init
 
 def run_sintatic():
   index_token = 0
@@ -38,7 +63,13 @@ def run_sintatic():
       else:
         print('Print is invalid')
         break
-    
+    elif (lexeme == 'read'):
+      (is_valid_read, index_token) = validate_grammar_read(index_token)
+      if(is_valid_read):
+        print('Read is valid')
+      else:
+        print('Read is invalid')
+        break
     index_token += 1
 
 if __name__ == '__main__':
