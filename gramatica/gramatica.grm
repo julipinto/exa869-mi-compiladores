@@ -1,0 +1,145 @@
+"Start Symbol" = <Inicio>
+
+! Espaco = {#9} | {#32}
+IDE  = {Letter}({Letter} | {Alphanumeric} | '_')*
+! ART = '+' | '-'| '*'| '/'
+! Increment = '++'
+! Decrement = '--' 
+!* <PRE> ::= 'var' | 'const' | 'struct' | 'extends' | 'procedure' | 'function'
+    | 'start' | 'return' | 'if' | 'else' | 'then' | 'while' | 'read'
+    | 'print' | 'int' | 'real' | 'boolean' | 'string' | 'true' | 'false'
+*!
+
+NRO = '-'? {Whitespace}* {Digit}+ ('.' {Digit} ({Digit})*)?
+{Simbolo} = {#32 .. #126} - {#34}
+CAC = '"'({Letter} | {Digit} | {Simbolo} | [ ])* '"'
+<REL> ::= '!=' | '==' | '<' | '<=' | '>' | '>=' | '='
+! LOG = '!' | '&&' | '||'
+! DEL = ';' | virgula | '(' | ')' | '[' | ']' | '{' | '}' | '.'
+<Boolean> ::= 'true' | 'false'
+ 
+!* Exemplos de listas           
+
+! O mesmo que (IDE)*
+<Muitos identificadores> ::= <Um ou muitos identificadores> | 
+      
+! O mesmo que (IDE)+    
+<Um ou muitos identificadores> ::= IDE <Um ou muitos identificadores> | IDE
+
+*!
+
+<SimboloSomaSub> ::= '+' | '-'
+<Operavel> ::= IDE | NRO
+
+! Expressao Aritmetica
+<Expressao> ::= <ExpressaoMulti> <SimboloSomaSub> <Expressao> | <ExpressaoMulti>
+<ExpressaoMulti>   ::= <Valor> '*' <ExpressaoMulti> | <Valor> '/' <ExpressaoMulti> | <Valor>
+<Valor> ::= <Operavel> | '(' <Expressao> ')'
+
+! Expressaõ relacional Falta verificar
+<ExpressaoRelacional> ::= <ValorRelacional> <REL> <ValorRelacional> | ! '(' <ExpressaoRelacional> ')'
+<ValorRelacional> ::= IDE | NRO | CAC | <RetornoFuncao> | '(' <ExpressaoRelacional> ')' | <Matriz> | <Boolean>  | <Comp> | '(' <Expressao> ')' | '(' <ExpressaoLogica> ')'
+
+! Expressão logica
+<ExpressaoLogica> ::= <neg> <OperadorLogico> <Expressao Opcional>
+<Expressao Opcional> ::= <op> <neg> <Expressao Opcional> |
+<op> ::= '&&' | '||'
+<neg> ::= <Negacao> | <ValorRelacional>
+! <ValorLogico> ::=  IDE | <Boolean> |  <RetornoFuncao> | <ExpressaoRelacional>
+<OperadorLogico> ::=   '&&' <neg> |  '||' <neg>
+<Negacao>::= '!' <ValorRelacional>
+ 
+
+!* <ExpressaoLogica> ::= <OpBoleana>
+         
+<OpBoleana> ::= <OperacaoAritmetica> | boleano | '(' <OpLogica>')'
+<OpBoleana2> ::=  <OpRel> | <OpLogica> 
+<OpLogica> ::= <OpBoleana2> <SimboloLogico> <OpBoleana2> 
+<NegValorBoleano> ::= '!'<Variavel>
+<OperacaoLogicaGeral> ::= <OpRelacional> | <OpLogica> | <NegValorBooleano>
+*!  
+       
+! Matriz
+<Matriz> ::= IDE <DimensoesDeAcesso>
+<DimensoesDeAcesso> ::= <Access> <end>
+<Access> ::= '[' <Indice> ']'
+<end> ::= <Access> |           
+<Indice> ::= NRO | IDE
+
+! Print
+<Print> ::= 'print' '(' <ConteudoDoPrint> ')' ';'
+<ConteudoDoPrint> ::= IDE | <Matriz> | <Comp> | CAC
+         
+! Tipo composto
+<Comp> ::= IDE '.' IDE
+        
+! Read
+<Read> ::= 'read' '(' <Ler> ')' ';'
+<Ler> ::= <Matriz> | IDE | <Comp>
+          
+! Chamada funcção
+<RetornoFuncao> ::= IDE '(' <ParametrosOpcionais> ')'
+<ParametrosOpcionais> ::= <ListaDeParametros> |
+<ListaDeParametros> ::= <Parametro> ',' <ListaDeParametros> | <Parametro>
+<Parametro> ::= IDE | NRO | CAC | <Matriz> | <RetornoFuncao> | <Comp>
+
+! Ou também chamada de procedimento
+<ChamadaFuncao> ::= <RetornoFuncao> ';'
+
+! Bloco
+<Bloco> ::= '{' <Conteudos> '}'
+<Conteudos> ::= <ConteudoDeBloco> <Conteudos>  | <>
+<ConteudoDeBloco> ::= <Expressao> ';' | <ExpressaoRelacional> ';' | <ExpressaoLogica> ';' | <Matriz> ';' | <Print> | <Read> | <ChamadaFuncao> | <If> | <VarDeclaracao> | <While>
+
+! While Verificar expressao
+!<While> ::= 'while' '(' <Exp> ')' <Bloco>   
+!<Exp> ::= <ExpressaoLogica> | <Boolean> | <ExpressaoRelacional>
+
+! While
+<While> ::= 'while' '(' <Exp> ')' <Bloco>
+<MaisExp> ::= <Exp>
+<Exp> ::= <ExpressaoLogica> | <Boolean> | <ExpressaoRelacional> | <MaisExp>
+
+! If
+<If> ::= 'if' '(' <Exp> ')' 'then' <ConteudoDoIf>
+<ConteudoDoIf> ::= <Bloco> | <Bloco> 'else' <Bloco>
+
+! Declaração de função   ps: lista de parmeteros ta errada  
+<Funcao> ::= 'function' <Tipo> IDE '(' <ListParametros> ')' <functionReturn>
+<functionReturn> ::= '{' <Conteudos> 'return' <ValorRelacional> ';' '}'
+<ListParametros> ::= <Parametro> | <Parametro> ',' <ListParametros> | <>
+<Parametro> ::= <Tipo> IDE
+                 
+! Tipo
+<Tipo> ::= 'int' | 'real' | 'boolean' | 'string' | IDE
+
+! Procedimento
+<Procedimento> ::= 'procedure' IDE '(' <ListParametros> ')'<Bloco>
+
+! Variaveis globais
+<VarDeclaracao> ::= 'var' '{' <todasAsVars>  '}'
+<Constantes> ::= 'const' '{' <todasAsVars>  '}'
+<todasAsVars> ::= <dvar> <todasAsVars> | <dvar>
+
+! Declaração de tipo composto
+<DeclaracaoStruct> ::= 'struct' IDE '{' <todasAsVars> '}'
+
+! Declaração de variavel
+<dvar> ::= <Tipo> <varList> ';'
+<varList> ::= IDE <attopt> ',' <varList> | IDE <attopt>
+<attopt> ::= '=' <ValorRelacional> |
+
+          
+! Extends
+<Extendstc> ::= IDE 'extends' IDE '{' <todasAsVars> '}'
+         
+<Estrutura> ::= <compOpt> <extOpt> <varOpt> <constOpt> <funcoes>
+<varOpt> ::= <VarDeclaracao> |
+<constOpt> ::= <Constantes> |
+<compOpt> ::= <DeclaracaoStruct> <compOpt> |
+<extOpt> ::= <Extendstc> <extOpt> |
+<funcoes> ::= <funOuProc> <funcoes> | <funOuProc>
+<funOuProc> ::= <Funcao> | <Procedimento>
+           
+<Inicio> ::= <Estrutura> ! <Matriz> |  <Expressao> | <Print> | <Read> | <ExpressaoRelacional> | <ChamadaFuncao> | <ExpressaoLogica> | <Bloco> | <While> | <If> | <Funcao> | <Procedimento> | <DeclaracaoStruct> | <Extendstc> | <VarDeclaracao> | <Constantes>
+          
