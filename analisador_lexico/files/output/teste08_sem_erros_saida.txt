@@ -1,6 +1,13 @@
 26 PRE print
 26 DEL (
 26 IDE ide
+26 DEL [
+26 NRO 0
+26 DEL ]
+26 DEL [
+26 IDE a
+26 NRO 2
+26 DEL ]
 26 DEL )
 26 DEL ;
 

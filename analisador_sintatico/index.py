@@ -6,6 +6,9 @@ sys.path.append(os.path.abspath('.'))
 # run with $ python .\analisador_sintatico\index.py
 
 from analisador_lexico.index import AcronymsEnum, run_lexical
+ACR_CCA = AcronymsEnum.CHARACTER_CHAIN.value
+ACR_IDE = AcronymsEnum.IDENTIFIER.value
+ACR_NUM = AcronymsEnum.NUMBER.value
 
 tokens = run_lexical()
 
@@ -14,9 +17,6 @@ def is_type(token):
 
 def validate_printable(index_token):
   [line, acronym, lexeme] = tokens[index_token]
-  ACR_CCA = AcronymsEnum.CHARACTER_CHAIN.value
-  ACR_IDE = AcronymsEnum.IDENTIFIER.value
-  ACR_NUM = AcronymsEnum.NUMBER.value
 
   if(acronym == ACR_CCA or acronym == ACR_NUM):
     return index_token, lexeme
@@ -95,56 +95,95 @@ def validate_grammar_read(index_init):
 
 
 
+# def validate_matrix(index_token):
+#   finsh = False
+
+#   if(tokens[index_token][1] != ACR_IDE):
+#     print('Error: Identifier expected')
+#     return index_token
+
+#   acc = tokens[index_token][2]
+#   brackets_stack = []
+#   waiting_index = False
+
+#   while not finsh and index_token + 1 < len(tokens):
+#     [line, next_acronym, next_lexeme] = tokens[index_token + 1]
+#     no_bracket_left = len(brackets_stack) == 0
+#     if(next_lexeme == '['):
+#       waiting_index = True
+#       brackets_stack.append(next_lexeme)
+
+#     elif(next_lexeme == ']'):
+#       if(no_bracket_left):
+#         finsh = True
+#         continue
+#       if(waiting_index): 
+#         print('Missing index in matrix on line ' + str(line + 1))
+#       brackets_stack.pop()
+
+#     elif(next_acronym == ACR_IDE or next_acronym == ACR_NUM):
+#       if(no_bracket_left):
+#         finsh = True
+#         continue
+#       if(waiting_index): 
+#         waiting_index = False
+#       else: 
+#         print("Unexpected token '" + next_lexeme + "'")
+
+#     else:
+#       if(no_bracket_left):
+#         finsh = True
+#         continue
+#       if(waiting_index): 
+#         print("Unexpected token '" + next_lexeme + "'")
+#     acc += next_lexeme
+#     index_token += 1
+  
+#   if(len(brackets_stack) > 0):
+#     if(waiting_index):
+#       print('Missing index in matrix ' + acc)
+#     print('Missing closing bracket in matrix ' + acc)
+  
+#   return index_token, acc
+
 def validate_matrix(index_token):
   finsh = False
-  ACR_IDE = AcronymsEnum.IDENTIFIER.value
-  ACR_NUM = AcronymsEnum.NUMBER.value
 
   if(tokens[index_token][1] != ACR_IDE):
     print('Error: Identifier expected')
     return index_token
-
   acc = tokens[index_token][2]
-  brackets_stack = []
-  waiting_index = False
+  
+  expecting = ['[', '<index>', ']']
+  expecting.reverse()
 
   while not finsh and index_token + 1 < len(tokens):
     [line, next_acronym, next_lexeme] = tokens[index_token + 1]
-    no_bracket_left = len(brackets_stack) == 0
-    if(next_lexeme == '['):
-      waiting_index = True
-      brackets_stack.append(next_lexeme)
-
-    elif(next_lexeme == ']'):
-      if(no_bracket_left):
+    if(len(expecting) == 0):
+      if(next_lexeme == '['):
+        expecting = ['<index>', ']']
+        expecting.reverse()
+        acc += next_lexeme
+      else:
         finsh = True
         continue
-      if(waiting_index): 
-        print('Missing index in matrix on line ' + str(line + 1))
-      brackets_stack.pop()
-
-    elif(next_acronym == ACR_IDE or next_acronym == ACR_NUM):
-      if(no_bracket_left):
-        finsh = True
-        continue
-      if(waiting_index): 
-        waiting_index = False
-      else: 
-        print("Unexpected token '" + next_lexeme + "'")
-
-    else:
-      if(no_bracket_left):
-        finsh = True
-        continue
-      if(waiting_index): 
-        print("Unexpected token '" + next_lexeme + "'")
-    acc += next_lexeme
+    else: 
+      next_expect = expecting[-1]
+      if(next_expect == '<index>'):
+        if(next_acronym == ACR_IDE or next_acronym == ACR_NUM):
+          expecting.pop()
+          acc += next_lexeme
+        else:
+          print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(line + 1))
+          acc += red_painting(next_lexeme)
+      elif(next_lexeme == next_expect):
+        expecting.pop()
+        acc += next_lexeme
+      else:
+        print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(line + 1))
+        acc += red_painting(next_lexeme)
+    
     index_token += 1
-  
-  if(len(brackets_stack) > 0):
-    if(waiting_index):
-      print('Missing index in matrix ' + acc)
-    print('Missing closing bracket in matrix ' + acc)
   
   return index_token, acc
 
