@@ -1,13 +1,10 @@
-26 PRE print
-26 DEL (
-26 IDE ide
-26 DEL [
-26 NRO 0
-26 DEL ]
-26 DEL [
-26 IDE a
-26 NRO 2
-26 DEL ]
-26 DEL )
-26 DEL ;
+28 PRE read
+28 DEL (
+28 IDE testing
+28 DEL .
+28 IDE compound
+28 DEL .
+28 IDE d
+28 DEL )
+28 DEL ;
 

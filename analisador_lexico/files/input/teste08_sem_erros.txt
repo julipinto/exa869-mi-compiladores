@@ -23,4 +23,6 @@ procedure start {  // comeca aqui o programa principal
  
 } */
 
-print(ide[0][a 2]);
+// print(ide[0][a 2]);
+
+read(testing.compound.d);
