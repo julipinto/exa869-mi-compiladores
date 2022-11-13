@@ -7,9 +7,6 @@ sys.path.append(os.path.abspath('.'))
 
 from analisador_lexico.index import AcronymsEnum, run_lexical
 
-# import ./analisador_lexico/index.py
-#from index import run_lexical
-
 tokens = run_lexical()
 
 def is_type(token):
@@ -112,8 +109,58 @@ def validate_matrix(index_token):
   print(acc)
   return index_token
 
-def check_compound_type(index_token):
-  pass
+def validate_compound_type(index_token): 
+  finsh = False
+  ACR_IDE = AcronymsEnum.IDENTIFIER.value
+
+  if(tokens[index_token][1] != ACR_IDE):
+    print('Error: Identifier expected')
+    return index_token
+  
+  acc = tokens[index_token][2]
+  while not finsh and index_token + 1 < len(tokens):
+    [line0, acronym0, lexeme0] = tokens[index_token + 1]
+
+    if(lexeme0 != '.'):
+      finsh = True
+      continue
+
+    acc += lexeme0
+
+    # End of line before get the identifier
+    if(index_token + 2 >= len(tokens)):
+      index_token += 1
+      print('Error: Identifier expected at line ' + str(line0 + 1))
+      continue
+
+    [line1, acronym1, lexeme1] = tokens[index_token + 2]
+
+    if(lexeme1 == '.'):
+      print('Identifier is missing at line ' + str(line1 + 1))
+      index_token += 1
+      continue    
+
+    if(acronym1 != ACR_IDE):
+      print('Unexpected token ' + lexeme1 + ' at line ' + str(line1 + 1))
+      index_token += 1
+
+    acc += lexeme1
+    index_token += 2
+
+  print(acc)
+  return index_token
+
+def is_sum_or_sub(index_token):
+  [_, _, lexeme] = tokens[index_token]
+  return lexeme == '+' or lexeme == '-'
+
+def is_mult_or_div(index_token):
+  [_, _, lexeme] = tokens[index_token]
+  return lexeme == '*' or lexeme == '/'
+
+def is_operable(index_token):
+  [_, acronym, _] = tokens[index_token]
+  return acronym == AcronymsEnum.IDENTIFIER.value or acronym == AcronymsEnum.NUMBER.value
 
 def check_identifier(index_token):
   pass
@@ -140,7 +187,7 @@ def run_sintatic():
         print('Read is invalid')
         break
     else: 
-      (index_token) = validate_matrix(index_token)
+      (index_token) = validate_compound_type(index_token)
 
     
     index_token += 1

@@ -1,12 +1,6 @@
-30 IDE matrix
-30 DEL [
-30 IDE a
-30 DEL ]
-30 DEL [
-30 NRO 1
-30 DEL ]
-30 DEL [
-30 IDE aa
-30 IDE a
-30 DEL ]
+30 IDE comp
+30 DEL .
+30 DEL .
+30 IDE comp
+30 DEL .
 

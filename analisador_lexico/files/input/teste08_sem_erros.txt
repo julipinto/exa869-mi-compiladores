@@ -27,4 +27,4 @@ procedure start {  // comeca aqui o programa principal
 
 //read(teste);
 
-matrix[a][1][aa a]
+comp..comp.
