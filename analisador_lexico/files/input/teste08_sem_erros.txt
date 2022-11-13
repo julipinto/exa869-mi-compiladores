@@ -25,4 +25,6 @@ procedure start {  // comeca aqui o programa principal
 
 //print(cadeia)
 
-read(teste);
+//read(teste);
+
+matrix[a][1][aa a]

@@ -1,6 +1,12 @@
-28 PRE read
-28 DEL (
-28 IDE teste
-28 DEL )
-28 DEL ;
+30 IDE matrix
+30 DEL [
+30 IDE a
+30 DEL ]
+30 DEL [
+30 NRO 1
+30 DEL ]
+30 DEL [
+30 IDE aa
+30 IDE a
+30 DEL ]
 

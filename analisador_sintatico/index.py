@@ -1,6 +1,9 @@
 import sys
+import os
 
-sys.path.append('C:\\Users\\adlla\\Documents\\GitHub\\exa869-mi-compiladores')
+#sys.path.append('C:\\Users\\adlla\\Documents\\GitHub\\exa869-mi-compiladores')
+sys.path.append(os.path.abspath('.'))
+# run with $ python .\analisador_sintatico\index.py
 
 from analisador_lexico.index import AcronymsEnum, run_lexical
 
@@ -49,6 +52,72 @@ def validate_grammar_read(index_init):
             correct_grammar = True
   return correct_grammar, index_init
 
+
+
+
+def validate_matrix(index_token):
+  finsh = False
+  ACR_IDE = AcronymsEnum.IDENTIFIER.value
+  ACR_NUM = AcronymsEnum.NUMBER.value
+
+  if(tokens[index_token][1] != ACR_IDE):
+    print('Error: Identifier expected')
+    return index_token
+
+  acc = tokens[index_token][2]
+  brackets_stack = []
+  waiting_index = False
+
+  while not finsh and index_token + 1 < len(tokens):
+    [line, next_acronym, next_lexeme] = tokens[index_token + 1]
+    no_bracket_left = len(brackets_stack) == 0
+    if(next_lexeme == '['):
+      acc += next_lexeme
+      waiting_index = True
+      brackets_stack.append(next_lexeme)
+
+    elif(next_lexeme == ']'):
+      if(no_bracket_left):
+        finsh = True
+        continue
+      if(waiting_index): 
+        print('Missing index in matrix on line ' + str(line + 1))
+      acc += next_lexeme
+      brackets_stack.pop()
+
+    elif(next_acronym == ACR_IDE or next_acronym == ACR_NUM):
+      if(no_bracket_left):
+        finsh = True
+        continue
+      if(waiting_index): 
+        waiting_index = False
+      else: 
+        print("Unexpected token '" + next_lexeme + "'")
+      acc += str(next_lexeme)
+
+    else:
+      if(no_bracket_left):
+        finsh = True
+        continue
+      if(waiting_index): 
+        print("Unexpected token '" + next_lexeme + "'")
+      acc += next_lexeme
+    index_token += 1
+  
+  if(len(brackets_stack) > 0):
+    if(waiting_index):
+      print('Missing index in matrix ' + acc)
+    print('Missing closing bracket in matrix ' + acc)
+  
+  print(acc)
+  return index_token
+
+def check_compound_type(index_token):
+  pass
+
+def check_identifier(index_token):
+  pass
+
 def run_sintatic():
   index_token = 0
   len_tokens = len(tokens)
@@ -70,7 +139,11 @@ def run_sintatic():
       else:
         print('Read is invalid')
         break
+    else: 
+      (index_token) = validate_matrix(index_token)
+
+    
     index_token += 1
 
 if __name__ == '__main__':
-    run_sintatic()
+  run_sintatic()
