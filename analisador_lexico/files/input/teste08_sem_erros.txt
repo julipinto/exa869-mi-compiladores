@@ -23,4 +23,8 @@ procedure start {  // comeca aqui o programa principal
  
 } */
 
-const { int a, b; string c, b }
+var { 
+	int a, b; 
+	string c, b; 
+	boolean d, e, f, g ;
+}

@@ -7,6 +7,9 @@
   matriz
   acesso ao valor composto
   is_type
+  variáveis globais
+    constantes
+    variaveis
 
 - +/- Feito, precisa consertar 
   declaração de variável --> falta fazer atribuição ao declarar
@@ -16,8 +19,7 @@
   while --> Validar a expressão e o bloco
 
 - Falta fazer
-  variáveis globais
-  constantes
+
   expressão aritmética
   expressão lógica
   expressão relacional

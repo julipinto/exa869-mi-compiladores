@@ -311,19 +311,19 @@ def validate_grammar_if(index_token):
 #FIXME: permitir atribuir valores a variáveis (int a = 1, b = 2;)
 
 def validate_grammar_variable_declaration(index_token):
-  print('validate_grammar_variable_declaration production')
-  
   if(not is_type(tokens[index_token][2])):
     print('Error: Type expected')
     return index_token, tokens[index_token][2]
+
   acc = tokens[index_token][2] + ' '
 
+  # May have more = , Ide <mayhavemore> | 
   index_token += 1
   expecting = create_stack(['IDE', '<may_have_more>', ';'])
 
   while(len(expecting) > 0 and index_token + 1 <= len(tokens)):
-    next_expect = expecting[-1]
     [_, acronym, lexeme] = tokens[index_token]
+    next_expect = expecting[-1]
 
     if(next_expect == '<may_have_more>'):
       if(lexeme == ','):
@@ -339,8 +339,10 @@ def validate_grammar_variable_declaration(index_token):
       print('Error: Unexpected token ' + lexeme)
       acc += red_painting(lexeme) + ' '
 
+    if(len(expecting) == 0): continue
+
     index_token += 1
-    
+
   print_if_missing_expecting(expecting)
 
   return index_token, acc
@@ -437,7 +439,6 @@ def validate_grammar_global_variable_declaration(index_token):
     [line, acronym, lexeme] = tokens[index_token]
     next_expect = expecting[-1]
 
-
     if(next_expect == '<init>' and (lexeme == 'const' or lexeme == 'var')):
       expecting.pop()
       acc += lexeme
@@ -446,17 +447,15 @@ def validate_grammar_global_variable_declaration(index_token):
       if(is_type(lexeme)):
         (index_token, accum) = validate_grammar_variable_declaration(index_token)
         acc += accum
-        expecting[-1] = ';'
+        
+        if(not (index_token + 1 < len(tokens) and is_type(tokens[index_token + 1][2]))):
+          expecting.pop()
       else:
         print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
         acc += red_painting(lexeme)
 
     elif(next_expect == lexeme):
-      if(not (lexeme == ';' and index_token + 1 < len(tokens) and is_type(tokens[index_token + 1][2]))):
-        expecting.pop()
-      else:
-        expecting[-1] = '<all_vars>'
-      print(expecting, index_token, tokens[index_token], tokens[index_token+1])
+      expecting.pop()
       acc += lexeme
 
     else:
