@@ -1,10 +1,13 @@
-26 PRE print
-26 DEL (
-26 IDE ide
-26 DEL .
-26 IDE ide
-26 DEL .
-26 IDE ide
-26 DEL )
+26 PRE const
+26 DEL {
+26 PRE int
+26 IDE a
+26 DEL ,
+26 IDE b
 26 DEL ;
+26 PRE string
+26 IDE c
+26 DEL ,
+26 IDE b
+26 DEL }
 

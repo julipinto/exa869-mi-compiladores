@@ -9,12 +9,15 @@
   is_type
 
 - +/- Feito, precisa consertar 
-  declaração de variável (falta fazer atribuição ao declarar)
+  declaração de variável --> falta fazer atribuição ao declarar
+  struct --> ainda falta tratar das variáveis declaradas dentro da struct <all_vars>
+  extends --> ainda falta tratar das variáveis declaradas dentro da struct <all_vars>
+  if --> Validar a expressão e o bloco
+  while --> Validar a expressão e o bloco
 
 - Falta fazer
   variáveis globais
   constantes
-  extends
   expressão aritmética
   expressão lógica
   expressão relacional
@@ -23,9 +26,8 @@
   chamada de função
   retorno de função
   procedimento
-  if
-  struct
-  while
   bloco
   expressao do inicio
+
+  ## Revisar todos os erros numa saída mais comum
   ===================================================================

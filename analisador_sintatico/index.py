@@ -238,20 +238,84 @@ def is_operable(index_token):
   [_, acronym, _] = tokens[index_token]
   return acronym == AcronymsEnum.IDENTIFIER.value or acronym == AcronymsEnum.NUMBER.value
 
+###############################################  ###############################################
+#TODO: validar as expressões
+#TODO: validar o bloco
 def validate_grammar_while(index_token):
-  pass
+  expecting = create_stack(['while', '(', '<exp>', ')', '<bloco>'])
+  acc = ""
+
+  while index_token < len(tokens) and len(expecting) > 0:
+    [line, acronym, lexeme] = tokens[index_token]
+    next_expect = expecting[-1]
+
+    if(next_expect == '<exp>'):
+      expecting.pop()
+      acc += lexeme
+
+    elif(next_expect == '<bloco>'):
+      expecting.pop()
+      acc += lexeme
+
+    elif(next_expect == lexeme):
+      expecting.pop()
+      acc += lexeme
+
+    else:
+      acc += red_painting(lexeme)
+      print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+    
+    index_token += 1
+
+
+  print_if_missing_expecting(expecting)
+  
+  print(acc)
+  return index_token, acc
+
+###############################################  ###############################################
 
 def validate_grammar_if(index_token):
-  pass
+  expecting = create_stack(['if', '(', '<exp>', ')', '<bloco>'])
+  acc = ""
 
+  while index_token < len(tokens) and len(expecting) > 0:
+    [line, acronym, lexeme] = tokens[index_token]
+    next_expect = expecting[-1]
+
+    if(next_expect == '<exp>'):
+      expecting.pop()
+      acc += lexeme
+
+    elif(next_expect == '<bloco>'):
+      expecting.pop()
+      acc += lexeme
+
+    elif(next_expect == lexeme):
+      expecting.pop()
+      acc += lexeme
+
+    else:
+      acc += red_painting(lexeme)
+      print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+    
+    index_token += 1
+
+
+  print_if_missing_expecting(expecting)
+  
+  print(acc)
+  return index_token, acc
 
 ############################################### VARIABLE DECLARATION ###############################################
-
+#FIXME: permitir atribuir valores a variáveis (int a = 1, b = 2;)
 
 def validate_grammar_variable_declaration(index_token):
+  print('validate_grammar_variable_declaration production')
+  
   if(not is_type(tokens[index_token][2])):
     print('Error: Type expected')
-    return index_token
+    return index_token, tokens[index_token][2]
   acc = tokens[index_token][2] + ' '
 
   index_token += 1
@@ -281,6 +345,131 @@ def validate_grammar_variable_declaration(index_token):
 
   return index_token, acc
 
+############################################### COMPOUND DECLARATION ###############################################
+# TODO: Validar o <all_vars>
+
+def validate_grammar_compound_declaration(index_token):
+  expecting = create_stack(['struct', 'IDE', '{', '<all_vars>', '}', ';'])
+  acc = ""
+
+  while index_token < len(tokens) and len(expecting) > 0:
+    [line, acronym, lexeme] = tokens[index_token]
+    next_expect = expecting[-1]
+
+    if(next_expect == '<all_vars>'):
+      ## NEEDS A VALIDATION HERE
+      expecting.pop()
+      acc += lexeme
+      # valid_args = IDE_PRODUCTIONS
+      # (index_token, accum) = validate_arg(valid_args , index_token)
+
+      # if(accum != False):
+      #   expecting.pop()
+      #   acc += accum
+      # else:
+      #   print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+      #   acc += red_painting(lexeme)
+
+    elif(next_expect in [acronym, lexeme]):
+      expecting.pop()
+      acc += lexeme
+
+    else:
+      acc += red_painting(lexeme)
+      print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+    
+    index_token += 1
+
+
+  print_if_missing_expecting(expecting)
+  
+  print(acc)
+  return index_token, acc
+
+############################################### EXTENDS ###############################################
+# TODO: Validar o <all_vars>
+
+def validate_grammar_extends(index_token):
+  expecting = create_stack(['IDE', 'extends', 'IDE', '{', '<all_vars>', '}', ';'])
+  acc = ""
+
+  while index_token < len(tokens) and len(expecting) > 0:
+    [line, acronym, lexeme] = tokens[index_token]
+    next_expect = expecting[-1]
+
+    if(next_expect == '<all_vars>'):
+      ## NEEDS A VALIDATION HERE
+      expecting.pop()
+      acc += lexeme
+      # valid_args = IDE_PRODUCTIONS
+      # (index_token, accum) = validate_arg(valid_args , index_token)
+
+      # if(accum != False):
+      #   expecting.pop()
+      #   acc += accum
+      # else:
+      #   print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+      #   acc += red_painting(lexeme)
+
+    elif(next_expect in [acronym, lexeme]):
+      expecting.pop()
+      acc += lexeme
+
+    else:
+      acc += red_painting(lexeme)
+      print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+    
+    index_token += 1
+
+
+  print_if_missing_expecting(expecting)
+  
+  print(acc)
+  return index_token, acc
+
+############################################### GLOBAL VARIABLE ###############################################
+def validate_grammar_global_variable_declaration(index_token):
+  # BUG: NÃO TERMINEI AINDA
+  expecting = create_stack(['<init>', '{', '<all_vars>', '}'])
+  acc = ""
+
+  while index_token < len(tokens) and len(expecting) > 0:
+    [line, acronym, lexeme] = tokens[index_token]
+    next_expect = expecting[-1]
+
+
+    if(next_expect == '<init>' and (lexeme == 'const' or lexeme == 'var')):
+      expecting.pop()
+      acc += lexeme
+
+    elif(next_expect == '<all_vars>' and index_token + 1 < len(tokens)):
+      if(is_type(lexeme)):
+        (index_token, accum) = validate_grammar_variable_declaration(index_token)
+        acc += accum
+        expecting[-1] = ';'
+      else:
+        print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+        acc += red_painting(lexeme)
+
+    elif(next_expect == lexeme):
+      if(not (lexeme == ';' and index_token + 1 < len(tokens) and is_type(tokens[index_token + 1][2]))):
+        expecting.pop()
+      else:
+        expecting[-1] = '<all_vars>'
+      print(expecting, index_token, tokens[index_token], tokens[index_token+1])
+      acc += lexeme
+
+    else:
+      acc += red_painting(lexeme)
+      print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+    
+
+    index_token += 1
+
+  print(acc)
+  return index_token, acc
+
+
 ############################################### MAIN ###############################################
 
 def run_sintatic():
@@ -297,15 +486,16 @@ def run_sintatic():
       (index_token, word) = validate_grammar_read(index_token)
 
     elif (lexeme == 'while'):
-      #fazer
       (index_token, word) = validate_grammar_while(index_token)
 
     elif (lexeme == 'if'):
-      #fazer
       (index_token, word) = validate_grammar_if(index_token)
     
     elif (lexeme == 'struct'):
-      pass
+      validate_grammar_compound_declaration(index_token)
+
+    elif(lexeme == 'const' or lexeme == 'var'):
+      (index_token, word) = validate_grammar_global_variable_declaration(index_token)
 
     elif(is_type(lexeme)):
       (index_token, word) = validate_grammar_variable_declaration(index_token)
@@ -321,8 +511,7 @@ def run_sintatic():
         #chamada de função
         pass
       elif(next_lexeme == 'extends'):
-        #extensão de classe
-        pass
+        (index_token, word) = validate_grammar_extends(index_token)
 
     
     index_token += 1
