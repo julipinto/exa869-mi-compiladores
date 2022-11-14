@@ -1,4 +1,10 @@
-28 PRE string
-28 IDE cac
-28 DEL ;
+26 PRE print
+26 DEL (
+26 IDE ide
+26 DEL .
+26 IDE ide
+26 DEL .
+26 IDE ide
+26 DEL )
+26 DEL ;
 

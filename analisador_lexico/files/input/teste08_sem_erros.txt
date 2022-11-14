@@ -23,6 +23,6 @@ procedure start {  // comeca aqui o programa principal
  
 } */
 
-// print(ide[0][a 2]);
+print(ide.ide.ide);
 
-string cac;
+//string cac;

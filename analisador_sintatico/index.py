@@ -32,27 +32,39 @@ def create_stack(arr):
   arr.reverse()
   return arr
 
-############################################### PRINT FUNCTIONS ###############################################
+IDE_PRODUCTIONS = ['IDE', 'MATRIX', 'COMPOUND_TYPE']
 
-def validate_printable(index_token):
-  [line, acronym, lexeme] = tokens[index_token]
+## PODE SER QUE TENHA QUE MELHORAR ISSO AQUI
+# FUNLÇÃO GENÉRICA QUE VALIDA ARGUMENTOS DE FUNÇÕES, EXEMPLO PRINT E READ
+def validate_arg(valid_args_list, index_token):
+  # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
+  [_, acronym, lexeme] = tokens[index_token]
 
-  if(acronym == ACR_CCA or acronym == ACR_NUM):
+  if(ACR_CCA in valid_args_list and acronym == ACR_CCA):
     return index_token, lexeme
 
-  if(acronym == ACR_IDE):
+  elif(ACR_NUM in valid_args_list and acronym == ACR_NUM):
+    return index_token, lexeme
+
+  # check if there is a production derivated from IDE
+  elif((set(IDE_PRODUCTIONS) & set(valid_args_list)) and acronym == ACR_IDE):
     [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
-    if(next_lexeme == ')'):
-      return index_token, lexeme
-    elif(next_lexeme == '.'):
-      return validate_compound_type(index_token)
-    elif(next_lexeme == '['):
-      return validate_matrix(index_token)
+
+    if('IDE' in valid_args_list and next_lexeme == ')'): return index_token, lexeme
+
+    elif('COMPOUND_TYPE' in valid_args_list and next_lexeme == '.'): return validate_compound_type(index_token)
+
+    elif('MATRIX' in valid_args_list and next_lexeme == '['): return validate_matrix(index_token)
+
     else:
       print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(next_line + 1))
       return index_token, lexeme
 
+  
+  #print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(next_line + 1))
   return index_token, False
+
+############################################### PRINT FUNCTIONS ###############################################
 
 def validate_grammar_print(index_token):
   expecting = create_stack(['print', '(', '<printable>', ')', ';'])
@@ -63,7 +75,9 @@ def validate_grammar_print(index_token):
     next_expect = expecting[-1]
 
     if(next_expect == '<printable>'):
-      (index_token, accum) = validate_printable(index_token)
+      valid_args = [ACR_CCA, ACR_NUM]
+      valid_args.extend(IDE_PRODUCTIONS)
+      (index_token, accum) = validate_arg(valid_args, index_token)
       if(accum != False):
         expecting.pop()
         acc += accum
@@ -89,24 +103,6 @@ def validate_grammar_print(index_token):
 
 ############################################### READ ###############################################
 
-def validate_readeble(index_token):
-  [line, acronym, lexeme] = tokens[index_token]
-
-  if(acronym == ACR_IDE):
-    [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
-
-    if(next_lexeme == ')'): return index_token, lexeme
-
-    elif(next_lexeme == '.'): return validate_compound_type(index_token)
-
-    elif(next_lexeme == '['): return validate_matrix(index_token)
-
-    else:
-      print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(next_line + 1))
-      return index_token, lexeme
-
-  return index_token, False
-
 def validate_grammar_read(index_token):
   expecting = create_stack(['read', '(', '<readeble>', ')', ';'])
   acc = ""
@@ -116,7 +112,9 @@ def validate_grammar_read(index_token):
     next_expect = expecting[-1]
 
     if(next_expect == '<readeble>'):
-      (index_token, accum) = validate_readeble(index_token)
+      valid_args = IDE_PRODUCTIONS
+      (index_token, accum) = validate_arg(valid_args , index_token)
+
       if(accum != False):
         expecting.pop()
         acc += accum
