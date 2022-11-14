@@ -23,8 +23,7 @@ procedure start {  // comeca aqui o programa principal
  
 } */
 
-var { 
-	int a, b; 
-	string c, b; 
-	boolean d, e, f, g ;
-}
+struct ide {
+	string a, b;
+	int c, d;
+};

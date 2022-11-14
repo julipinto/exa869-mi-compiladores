@@ -5,6 +5,7 @@ import os
 sys.path.append(os.path.abspath('.'))
 # run with $ python .\analisador_sintatico\index.py
 
+from inspect import currentframe, getframeinfo
 from analisador_lexico.index import AcronymsEnum, run_lexical
 
 tokens = run_lexical()
@@ -21,7 +22,12 @@ def is_type(token):
 
 def red_painting(word): 
   #painting a word in red on terminal
-  return '\033[1;31m' + word + '\033[0;0m'
+  return '\033[1;31m' + str(word) + '\033[0;0m'
+
+def blue_painting(word): 
+  #painting a word in blue on terminal
+  return '\033[1;34m' + str(word) + '\033[0;0m'
+
 
 def print_if_missing_expecting(expecting_stack):
   if(len(expecting_stack) > 0):
@@ -59,9 +65,11 @@ def validate_arg(valid_args_list, index_token):
     else:
       print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(next_line + 1))
       return index_token, lexeme
+  else: 
+    # DA ERRO AQUI
+    #print('Error: Unexpected token ' + lexeme + ' on line ' + str(next_line + 1))
+    pass
 
-  
-  #print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(next_line + 1))
   return index_token, False
 
 ############################################### PRINT FUNCTIONS ###############################################
@@ -98,7 +106,7 @@ def validate_grammar_print(index_token):
 
   print_if_missing_expecting(expecting)
   
-  print(acc)
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
   return index_token, acc
 
 ############################################### READ ###############################################
@@ -135,7 +143,7 @@ def validate_grammar_read(index_token):
 
   print_if_missing_expecting(expecting)
   
-  print(acc)
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
   return index_token, acc
 
 
@@ -180,10 +188,11 @@ def validate_matrix(index_token):
 
   print_if_missing_expecting(expecting)
   
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
+
   return index_token, acc
 
 ############################################### COMPOUND TYPE ###############################################
-
 def validate_compound_type(index_token): 
   finsh = False
   ACR_IDE = AcronymsEnum.IDENTIFIER.value
@@ -221,6 +230,8 @@ def validate_compound_type(index_token):
 
     acc += lexeme1
     index_token += 2
+
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
 
   return index_token, acc
 
@@ -270,7 +281,7 @@ def validate_grammar_while(index_token):
 
   print_if_missing_expecting(expecting)
   
-  print(acc)
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
   return index_token, acc
 
 ###############################################  ###############################################
@@ -304,7 +315,7 @@ def validate_grammar_if(index_token):
 
   print_if_missing_expecting(expecting)
   
-  print(acc)
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
   return index_token, acc
 
 ############################################### VARIABLE DECLARATION ###############################################
@@ -324,7 +335,7 @@ def validate_grammar_variable_declaration(index_token):
   while(len(expecting) > 0 and index_token + 1 <= len(tokens)):
     [_, acronym, lexeme] = tokens[index_token]
     next_expect = expecting[-1]
-
+    
     if(next_expect == '<may_have_more>'):
       if(lexeme == ','):
         expecting = create_stack(['IDE', '<may_have_more>', ';'])
@@ -345,6 +356,8 @@ def validate_grammar_variable_declaration(index_token):
 
   print_if_missing_expecting(expecting)
 
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
+  
   return index_token, acc
 
 ############################################### COMPOUND DECLARATION ###############################################
@@ -358,19 +371,16 @@ def validate_grammar_compound_declaration(index_token):
     [line, acronym, lexeme] = tokens[index_token]
     next_expect = expecting[-1]
 
-    if(next_expect == '<all_vars>'):
-      ## NEEDS A VALIDATION HERE
-      expecting.pop()
-      acc += lexeme
-      # valid_args = IDE_PRODUCTIONS
-      # (index_token, accum) = validate_arg(valid_args , index_token)
-
-      # if(accum != False):
-      #   expecting.pop()
-      #   acc += accum
-      # else:
-      #   print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
-      #   acc += red_painting(lexeme)
+    if(next_expect == '<all_vars>' and index_token + 1 < len(tokens)):
+      if(is_type(lexeme)):
+        (index_token, accum) = validate_grammar_variable_declaration(index_token)
+        acc += accum
+        
+        if(not (index_token + 1 < len(tokens) and is_type(tokens[index_token + 1][2]))):
+          expecting.pop()
+      else:
+        print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+        acc += red_painting(lexeme)
 
     elif(next_expect in [acronym, lexeme]):
       expecting.pop()
@@ -385,7 +395,8 @@ def validate_grammar_compound_declaration(index_token):
 
   print_if_missing_expecting(expecting)
   
-  print(acc)
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
+  
   return index_token, acc
 
 ############################################### EXTENDS ###############################################
@@ -399,19 +410,16 @@ def validate_grammar_extends(index_token):
     [line, acronym, lexeme] = tokens[index_token]
     next_expect = expecting[-1]
 
-    if(next_expect == '<all_vars>'):
-      ## NEEDS A VALIDATION HERE
-      expecting.pop()
-      acc += lexeme
-      # valid_args = IDE_PRODUCTIONS
-      # (index_token, accum) = validate_arg(valid_args , index_token)
-
-      # if(accum != False):
-      #   expecting.pop()
-      #   acc += accum
-      # else:
-      #   print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
-      #   acc += red_painting(lexeme)
+    if(next_expect == '<all_vars>' and index_token + 1 < len(tokens)):
+      if(is_type(lexeme)):
+        (index_token, accum) = validate_grammar_variable_declaration(index_token)
+        acc += accum
+        
+        if(not (index_token + 1 < len(tokens) and is_type(tokens[index_token + 1][2]))):
+          expecting.pop()
+      else:
+        print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+        acc += red_painting(lexeme)
 
     elif(next_expect in [acronym, lexeme]):
       expecting.pop()
@@ -426,12 +434,12 @@ def validate_grammar_extends(index_token):
 
   print_if_missing_expecting(expecting)
   
-  print(acc)
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
+  
   return index_token, acc
 
 ############################################### GLOBAL VARIABLE ###############################################
 def validate_grammar_global_variable_declaration(index_token):
-  # BUG: NÃO TERMINEI AINDA
   expecting = create_stack(['<init>', '{', '<all_vars>', '}'])
   acc = ""
 
@@ -465,7 +473,8 @@ def validate_grammar_global_variable_declaration(index_token):
 
     index_token += 1
 
-  print(acc)
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
+  
   return index_token, acc
 
 
