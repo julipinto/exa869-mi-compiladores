@@ -1,10 +1,4 @@
-28 PRE read
-28 DEL (
-28 IDE testing
-28 DEL .
-28 IDE compound
-28 DEL .
-28 IDE d
-28 DEL )
+28 PRE string
+28 IDE cac
 28 DEL ;
 

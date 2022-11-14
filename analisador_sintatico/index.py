@@ -13,7 +13,7 @@ ACR_NUM = AcronymsEnum.NUMBER.value
 tokens = run_lexical()
 
 def is_type(token):
-  return token == 'int' | token == 'real' | token == 'boolean' | token == 'string'
+  return token in ['int', 'real', 'boolean', 'string']
 
 def validate_printable(index_token):
   [line, acronym, lexeme] = tokens[index_token]
@@ -42,8 +42,7 @@ def red_painting(word):
   return '\033[1;31m' + word + '\033[0;0m'
 
 def validate_grammar_print(index_token):
-  expecting = ['print', '(', '<printable>', ')', ';']
-  expecting.reverse()
+  expecting = create_stack(['print', '(', '<printable>', ')', ';'])
   acc = ""
 
   while index_token < len(tokens) and len(expecting) > 0:
@@ -110,8 +109,7 @@ def validate_readeble(index_token):
   return index_token, False
 
 def validate_grammar_read(index_token):
-  expecting = ['read', '(', '<readeble>', ')', ';']
-  expecting.reverse()
+  expecting = create_stack(['read', '(', '<readeble>', ')', ';'])
   acc = ""
 
   while index_token < len(tokens) and len(expecting) > 0:
@@ -204,15 +202,13 @@ def validate_matrix(index_token):
     return index_token
   acc = tokens[index_token][2]
   
-  expecting = ['[', '<index>', ']']
-  expecting.reverse()
+  expecting = create_stack(['[', '<index>', ']'])
 
   while not finsh and index_token + 1 < len(tokens):
     [line, next_acronym, next_lexeme] = tokens[index_token + 1]
     if(len(expecting) == 0):
       if(next_lexeme == '['):
-        expecting = ['<index>', ']']
-        expecting.reverse()
+        expecting = create_stack(['<index>', ']'])
         acc += next_lexeme
       else:
         finsh = True
@@ -289,8 +285,49 @@ def is_operable(index_token):
   [_, acronym, _] = tokens[index_token]
   return acronym == AcronymsEnum.IDENTIFIER.value or acronym == AcronymsEnum.NUMBER.value
 
-def check_identifier(index_token):
+def validate_grammar_while(index_token):
   pass
+
+def validate_grammar_if(index_token):
+  pass
+
+def create_stack(arr):
+  arr.reverse()
+  return arr
+
+def validate_grammar_variable_declaration(index_token):
+  if(not is_type(tokens[index_token][2])):
+    print('Error: Type expected')
+    return index_token
+  acc = tokens[index_token][2] + ' '
+
+  index_token += 1
+  expecting = create_stack(['IDE', '<may_have_more>', ';'])
+
+  while(len(expecting) > 0 and index_token + 1 <= len(tokens)):
+    next_expect = expecting[-1]
+    [_, acronym, lexeme] = tokens[index_token]
+
+    if(next_expect == '<may_have_more>'):
+      if(lexeme == ','):
+        expecting = create_stack(['IDE', '<may_have_more>', ';'])
+        acc += lexeme + ' '
+      else:
+        expecting.pop()
+        continue
+    elif(next_expect in [acronym, lexeme]):
+      expecting.pop()
+      acc += lexeme + ' '
+    else:
+      print('Error: Unexpected token ' + lexeme)
+      acc += red_painting(lexeme) + ' '
+
+    index_token += 1
+    
+  if(len(expecting) > 0):
+    print('Error: Missing ' + expecting[-1])
+
+  return index_token, acc
 
 def run_sintatic():
   index_token = 0
@@ -301,11 +338,35 @@ def run_sintatic():
 
     if(lexeme == 'print'): 
       (index_token, word) = validate_grammar_print(index_token)
+
     elif (lexeme == 'read'):
       (index_token, word) = validate_grammar_read(index_token)
-    else: 
-      (index_token, word) = validate_matrix(index_token)
-      print(acc)
+
+    elif (lexeme == 'while'):
+      (index_token, word) = validate_grammar_while(index_token)
+
+    elif (lexeme == 'if'):
+      (index_token, word) = validate_grammar_if(index_token)
+    
+    elif (lexeme == 'struct'):
+      pass
+
+    elif(is_type(lexeme)):
+      (index_token, word) = validate_grammar_variable_declaration(index_token)
+
+    elif (acronym == ACR_IDE): 
+      [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
+
+      if(next_lexeme == '['):
+        (index_token, word) = validate_matrix(index_token)
+      elif(next_lexeme == '.'):
+        (index_token, word) = validate_compound_type(index_token)
+      elif(next_lexeme == '('):
+        #chamada de função
+        pass
+      elif(next_lexeme == 'extends'):
+        #extensão de classe
+        pass
 
     
     index_token += 1
