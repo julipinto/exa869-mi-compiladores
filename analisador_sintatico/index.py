@@ -6,14 +6,33 @@ sys.path.append(os.path.abspath('.'))
 # run with $ python .\analisador_sintatico\index.py
 
 from analisador_lexico.index import AcronymsEnum, run_lexical
+
+tokens = run_lexical()
+
+############################################### ACRONYMS CONSTANTS ###############################################
 ACR_CCA = AcronymsEnum.CHARACTER_CHAIN.value
 ACR_IDE = AcronymsEnum.IDENTIFIER.value
 ACR_NUM = AcronymsEnum.NUMBER.value
 
-tokens = run_lexical()
+############################################### AUXILIAR FUNCTIONS ###############################################
 
 def is_type(token):
   return token in ['int', 'real', 'boolean', 'string']
+
+def red_painting(word): 
+  #painting a word in red on terminal
+  return '\033[1;31m' + word + '\033[0;0m'
+
+def print_if_missing_expecting(expecting_stack):
+  if(len(expecting_stack) > 0):
+    expecting_stack.reverse()
+    print('Error: missing tokens ' + str(expecting_stack))
+
+def create_stack(arr):
+  arr.reverse()
+  return arr
+
+############################################### PRINT FUNCTIONS ###############################################
 
 def validate_printable(index_token):
   [line, acronym, lexeme] = tokens[index_token]
@@ -35,12 +54,6 @@ def validate_printable(index_token):
 
   return index_token, False
 
-def is_read(acronym):
-  return acronym == AcronymsEnum.IDENTIFIER.value
-
-def red_painting(word): 
-  return '\033[1;31m' + word + '\033[0;0m'
-
 def validate_grammar_print(index_token):
   expecting = create_stack(['print', '(', '<printable>', ')', ';'])
   acc = ""
@@ -48,6 +61,7 @@ def validate_grammar_print(index_token):
   while index_token < len(tokens) and len(expecting) > 0:
     [line, _, lexeme] = tokens[index_token]
     next_expect = expecting[-1]
+
     if(next_expect == '<printable>'):
       (index_token, accum) = validate_printable(index_token)
       if(accum != False):
@@ -56,9 +70,11 @@ def validate_grammar_print(index_token):
       else:
         print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
         acc += red_painting(lexeme)
+
     elif(next_expect == lexeme):
       expecting.pop()
       acc += lexeme
+
     else:
       acc += red_painting(lexeme)
       print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
@@ -66,42 +82,25 @@ def validate_grammar_print(index_token):
     index_token += 1
 
 
-  if(len(expecting) > 0):
-    expecting.reverse()
-    print('Error: missing tokens ' + str(expecting))
+  print_if_missing_expecting(expecting)
   
   print(acc)
   return index_token, acc
 
-'''
-  Valida a gramática do READ.
-'''
-# def validate_grammar_read(index_init):
-#   correct_grammar = False
-#   if(tokens[index_init][2] == 'read'):
-#     index_init = index_init + 1
-#     if(tokens[index_init][2] == '('):
-#       index_init = index_init + 1
-#       if(is_read(tokens[index_init][1])):
-#         index_init = index_init + 1
-#         if(tokens[index_init][2] == ')'):
-#           index_init = index_init + 1
-#           if(tokens[index_init][2] == ';'):
-#             index_init = index_init + 1
-#             correct_grammar = True
-#   return correct_grammar, index_init
+############################################### READ ###############################################
 
 def validate_readeble(index_token):
   [line, acronym, lexeme] = tokens[index_token]
 
   if(acronym == ACR_IDE):
     [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
-    if(next_lexeme == ')'):
-      return index_token, lexeme
-    elif(next_lexeme == '.'):
-      return validate_compound_type(index_token)
-    elif(next_lexeme == '['):
-      return validate_matrix(index_token)
+
+    if(next_lexeme == ')'): return index_token, lexeme
+
+    elif(next_lexeme == '.'): return validate_compound_type(index_token)
+
+    elif(next_lexeme == '['): return validate_matrix(index_token)
+
     else:
       print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(next_line + 1))
       return index_token, lexeme
@@ -115,6 +114,7 @@ def validate_grammar_read(index_token):
   while index_token < len(tokens) and len(expecting) > 0:
     [line, _, lexeme] = tokens[index_token]
     next_expect = expecting[-1]
+
     if(next_expect == '<readeble>'):
       (index_token, accum) = validate_readeble(index_token)
       if(accum != False):
@@ -123,9 +123,11 @@ def validate_grammar_read(index_token):
       else:
         print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
         acc += red_painting(lexeme)
+
     elif(next_expect == lexeme):
       expecting.pop()
       acc += lexeme
+
     else:
       acc += red_painting(lexeme)
       print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
@@ -133,66 +135,13 @@ def validate_grammar_read(index_token):
     index_token += 1
 
 
-  if(len(expecting) > 0):
-    expecting.reverse()
-    print('Error: missing tokens ' + str(expecting))
+  print_if_missing_expecting(expecting)
   
   print(acc)
   return index_token, acc
 
 
-
-
-# def validate_matrix(index_token):
-#   finsh = False
-
-#   if(tokens[index_token][1] != ACR_IDE):
-#     print('Error: Identifier expected')
-#     return index_token
-
-#   acc = tokens[index_token][2]
-#   brackets_stack = []
-#   waiting_index = False
-
-#   while not finsh and index_token + 1 < len(tokens):
-#     [line, next_acronym, next_lexeme] = tokens[index_token + 1]
-#     no_bracket_left = len(brackets_stack) == 0
-#     if(next_lexeme == '['):
-#       waiting_index = True
-#       brackets_stack.append(next_lexeme)
-
-#     elif(next_lexeme == ']'):
-#       if(no_bracket_left):
-#         finsh = True
-#         continue
-#       if(waiting_index): 
-#         print('Missing index in matrix on line ' + str(line + 1))
-#       brackets_stack.pop()
-
-#     elif(next_acronym == ACR_IDE or next_acronym == ACR_NUM):
-#       if(no_bracket_left):
-#         finsh = True
-#         continue
-#       if(waiting_index): 
-#         waiting_index = False
-#       else: 
-#         print("Unexpected token '" + next_lexeme + "'")
-
-#     else:
-#       if(no_bracket_left):
-#         finsh = True
-#         continue
-#       if(waiting_index): 
-#         print("Unexpected token '" + next_lexeme + "'")
-#     acc += next_lexeme
-#     index_token += 1
-  
-#   if(len(brackets_stack) > 0):
-#     if(waiting_index):
-#       print('Missing index in matrix ' + acc)
-#     print('Missing closing bracket in matrix ' + acc)
-  
-#   return index_token, acc
+############################################### MATRIX ###############################################
 
 def validate_matrix(index_token):
   finsh = False
@@ -230,8 +179,12 @@ def validate_matrix(index_token):
         acc += red_painting(next_lexeme)
     
     index_token += 1
+
+  print_if_missing_expecting(expecting)
   
   return index_token, acc
+
+############################################### COMPOUND TYPE ###############################################
 
 def validate_compound_type(index_token): 
   finsh = False
@@ -273,6 +226,8 @@ def validate_compound_type(index_token):
 
   return index_token, acc
 
+###############################################  ###############################################
+
 def is_sum_or_sub(index_token):
   [_, _, lexeme] = tokens[index_token]
   return lexeme == '+' or lexeme == '-'
@@ -291,9 +246,9 @@ def validate_grammar_while(index_token):
 def validate_grammar_if(index_token):
   pass
 
-def create_stack(arr):
-  arr.reverse()
-  return arr
+
+############################################### VARIABLE DECLARATION ###############################################
+
 
 def validate_grammar_variable_declaration(index_token):
   if(not is_type(tokens[index_token][2])):
@@ -324,10 +279,11 @@ def validate_grammar_variable_declaration(index_token):
 
     index_token += 1
     
-  if(len(expecting) > 0):
-    print('Error: Missing ' + expecting[-1])
+  print_if_missing_expecting(expecting)
 
   return index_token, acc
+
+############################################### MAIN ###############################################
 
 def run_sintatic():
   index_token = 0
@@ -343,9 +299,11 @@ def run_sintatic():
       (index_token, word) = validate_grammar_read(index_token)
 
     elif (lexeme == 'while'):
+      #fazer
       (index_token, word) = validate_grammar_while(index_token)
 
     elif (lexeme == 'if'):
+      #fazer
       (index_token, word) = validate_grammar_if(index_token)
     
     elif (lexeme == 'struct'):
