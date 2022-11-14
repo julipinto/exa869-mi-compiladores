@@ -1,1 +1,31 @@
 - agr ta permitindo printar inteiro
+
+  ===================================================================
+- O que foi feito
+  read
+  print
+  matriz
+  acesso ao valor composto
+  is_type
+
+- +/- Feito, precisa consertar 
+  declaração de variável (falta fazer atribuição ao declarar)
+
+- Falta fazer
+  variáveis globais
+  constantes
+  extends
+  expressão aritmética
+  expressão lógica
+  expressão relacional
+  declaração de função
+  lista de parametros
+  chamada de função
+  retorno de função
+  procedimento
+  if
+  struct
+  while
+  bloco
+  expressao do inicio
+  ===================================================================
