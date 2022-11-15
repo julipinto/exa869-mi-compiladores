@@ -1,11 +1,12 @@
-import sys
 import os
+import sys
 
 #sys.path.append('C:\\Users\\adlla\\Documents\\GitHub\\exa869-mi-compiladores')
 sys.path.append(os.path.abspath('.'))
 # run with $ python .\analisador_sintatico\index.py
 
 from inspect import currentframe, getframeinfo
+
 from analisador_lexico.index import AcronymsEnum, run_lexical
 
 tokens = run_lexical()
@@ -41,8 +42,8 @@ def create_stack(arr):
 IDE_PRODUCTIONS = ['IDE', 'MATRIX', 'COMPOUND_TYPE']
 
 ## PODE SER QUE TENHA QUE MELHORAR ISSO AQUI
-# FUNLÇÃO GENÉRICA QUE VALIDA ARGUMENTOS DE FUNÇÕES, EXEMPLO PRINT E READ
-def validate_arg(valid_args_list, index_token):
+# FUNÇÃO GENÉRICA QUE VALIDA ARGUMENTOS DE FUNÇÕES, EXEMPLO PRINT E READ
+def validate_arg(valid_args_list, index_token, function_arg = False):
   # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
   [_, acronym, lexeme] = tokens[index_token]
 
@@ -52,8 +53,15 @@ def validate_arg(valid_args_list, index_token):
   elif(ACR_NUM in valid_args_list and acronym == ACR_NUM):
     return index_token, lexeme
 
+  elif(ACR_IDE in valid_args_list and acronym == ACR_IDE and function_arg):
+    if(tokens[index_token+1][2] == '('):
+      [index_token, lexeme] = validate_grammar_function_return(index_token)
+      return index_token, lexeme
+    elif(tokens[index_token+1][2] == ','):
+      return index_token, lexeme
+
   # check if there is a production derivated from IDE
-  elif((set(IDE_PRODUCTIONS) & set(valid_args_list)) and acronym == ACR_IDE):
+  if((set(IDE_PRODUCTIONS) & set(valid_args_list)) and acronym == ACR_IDE):
     [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
 
     if('IDE' in valid_args_list and next_lexeme == ')'): return index_token, lexeme
@@ -101,7 +109,7 @@ def validate_grammar_print(index_token):
       acc += red_painting(lexeme)
       print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
     
-    if(len(expecting) > 0)
+    if(len(expecting) > 0):
       index_token += 1
 
 
@@ -139,7 +147,7 @@ def validate_grammar_read(index_token):
       acc += red_painting(lexeme)
       print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
     
-    if(len(expecting) > 0)
+    if(len(expecting) > 0):
       index_token += 1
 
 
@@ -186,7 +194,7 @@ def validate_matrix(index_token):
         print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(line + 1))
         acc += red_painting(next_lexeme)
     
-    if(len(expecting) > 0)
+    if(len(expecting) > 0):
       index_token += 1
 
   print_if_missing_expecting(expecting)
@@ -279,7 +287,7 @@ def validate_grammar_while(index_token):
       acc += red_painting(lexeme)
       print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
     
-    if(len(expecting) > 0)
+    if(len(expecting) > 0):
       index_token += 1
 
 
@@ -314,7 +322,7 @@ def validate_grammar_if(index_token):
       acc += red_painting(lexeme)
       print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
     
-    if(len(expecting) > 0)
+    if(len(expecting) > 0):
       index_token += 1
 
 
@@ -355,7 +363,7 @@ def validate_grammar_variable_declaration(index_token):
       print('Error: Unexpected token ' + lexeme)
       acc += red_painting(lexeme) + ' '
 
-    if(len(expecting) > 0)
+    if(len(expecting) > 0):
       index_token += 1
 
   print_if_missing_expecting(expecting)
@@ -394,7 +402,7 @@ def validate_grammar_compound_declaration(index_token):
       acc += red_painting(lexeme)
       print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
     
-    if(len(expecting) > 0)
+    if(len(expecting) > 0):
       index_token += 1
 
 
@@ -434,7 +442,7 @@ def validate_grammar_extends(index_token):
       acc += red_painting(lexeme)
       print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
     
-    if(len(expecting) > 0)
+    if(len(expecting) > 0):
       index_token += 1
 
   print_if_missing_expecting(expecting)
@@ -476,7 +484,7 @@ def validate_grammar_global_variable_declaration(index_token):
       print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
     
 
-    if(len(expecting) > 0)
+    if(len(expecting) > 0):
       index_token += 1
 
   print(blue_painting(getframeinfo(currentframe()).lineno), acc)
@@ -509,7 +517,7 @@ def validate_grammar_procedure_declaration():
       acc += red_painting(lexeme)
       print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
 
-    if(len(expecting) > 0)
+    if(len(expecting) > 0):
       index_token += 1
 
   print_if_missing_expecting(expecting)
@@ -518,7 +526,7 @@ def validate_grammar_procedure_declaration():
   return index_token, acc
 
 
-def validate_grammar_function_return():
+def validate_grammar_function_return(index_token):
   expecting = create_stack(['IDE', '(', '<optional_params>', ')'])
   acc = ""
 
@@ -527,8 +535,30 @@ def validate_grammar_function_return():
     next_expect = expecting[-1]
 
     if(next_expect == '<optional_params>'):
-      expecting.pop()
-      acc += lexeme
+      if(lexeme != ')'):
+        valid_args = [ACR_CCA, ACR_NUM]
+        valid_args.extend(IDE_PRODUCTIONS)
+        index_init_params = index_token
+
+        while index_token < len(tokens)-1 and tokens[index_token][2] != ')':
+          [line, acronym, lexeme] = tokens[index_token]
+          if(index_token != index_init_params):
+            if(lexeme == ',') and tokens[index_token+1][2] != ')':
+              index_token += 1
+              acc += ','
+          (index_token, accum) = validate_arg(valid_args, index_token, function_arg = True)
+          if(accum != False):
+            acc += accum
+          else:
+            print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+            acc += red_painting(lexeme)
+          index_token += 1
+        expecting.pop()
+        index_token -= 1
+      else:
+        expecting.pop()
+        next_expect = expecting[-1]
+        continue
 
     elif(next_expect in [acronym, lexeme]):
       expecting.pop()
@@ -538,7 +568,7 @@ def validate_grammar_function_return():
       acc += red_painting(lexeme)
       print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
 
-    if(len(expecting) > 0)
+    if(len(expecting) > 0):
       index_token += 1
 
   print_if_missing_expecting(expecting)
@@ -587,8 +617,7 @@ def run_sintatic():
       elif(next_lexeme == '.'):
         (index_token, production) = validate_compound_type(index_token)
       elif(next_lexeme == '('):
-        #chamada de função
-        pass
+        (index_token, production) = validate_grammar_function_return(index_token)
       elif(next_lexeme == 'extends'):
         (index_token, production) = validate_grammar_extends(index_token)
 
