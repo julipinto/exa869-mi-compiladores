@@ -10,13 +10,15 @@
   variáveis globais
     constantes
     variaveis
+  struct
+  extends
 
 - +/- Feito, precisa consertar 
   declaração de variável --> falta fazer atribuição ao declarar
-  struct --> ainda falta tratar das variáveis declaradas dentro da struct <all_vars>
-  extends --> ainda falta tratar das variáveis declaradas dentro da struct <all_vars>
-  if --> Validar a expressão e o bloco
+  if --> Validar a expressão e o bloco, fazer o else
   while --> Validar a expressão e o bloco
+  procedimento --> Validar a expressão e o bloco
+  retorno de função
 
 - Falta fazer
 
@@ -26,8 +28,6 @@
   declaração de função
   lista de parametros
   chamada de função
-  retorno de função
-  procedimento
   bloco
   expressao do inicio
 

@@ -23,7 +23,4 @@ procedure start {  // comeca aqui o programa principal
  
 } */
 
-struct ide {
-	string a, b;
-	int c, d;
-};
+int .. a , b
