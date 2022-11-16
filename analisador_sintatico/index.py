@@ -47,7 +47,7 @@ IDE_PRODUCTIONS = ['IDE', 'MATRIX', 'COMPOUND_TYPE']
 
 ## PODE SER QUE TENHA QUE MELHORAR ISSO AQUI
 # FUNÇÃO GENÉRICA QUE VALIDA ARGUMENTOS DE FUNÇÕES, EXEMPLO PRINT E READ
-def validate_arg(valid_args_list, index_token, function_arg = False):
+def validate_arg(valid_args_list, index_token, function_arg = False, end_ide = ')'):
   # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
   [_, acronym, lexeme] = tokens[index_token]
 
@@ -55,6 +55,9 @@ def validate_arg(valid_args_list, index_token, function_arg = False):
     return index_token, lexeme
 
   elif(ACR_NUM in valid_args_list and acronym == ACR_NUM):
+    return index_token, lexeme
+
+  elif('BOOLEAN' in valid_args_list and is_boolean(lexeme)):
     return index_token, lexeme
 
   elif(ACR_IDE in valid_args_list and acronym == ACR_IDE and function_arg):
@@ -68,7 +71,7 @@ def validate_arg(valid_args_list, index_token, function_arg = False):
   if((set(IDE_PRODUCTIONS) & set(valid_args_list)) and acronym == ACR_IDE):
     [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
 
-    if('IDE' in valid_args_list and next_lexeme == ')'): return index_token, lexeme
+    if('IDE' in valid_args_list and end_ide in [f"_{next_acronym}", next_lexeme]): return index_token, lexeme
 
     elif('COMPOUND_TYPE' in valid_args_list and next_lexeme == '.'): return validate_compound_type(index_token)
 
@@ -610,6 +613,8 @@ def validate_grammar_relational_expression(index_token):
     next_expect = expecting[-1]
 
     if(next_expect == '<relational_value>'):
+      #valid_args = [ACR_CCA, ACR_NUM, ACR_IDE, 'MATRIX', 'COMPOUND_TYPE', 'BOOLEAN']
+      #(index_token, accum) = validate_arg(valid_args, index_token, end_ide = '_REL')
       (index_token, accum) = validate_arg_relational_expression(index_token)
       if(accum != False):
         expecting.pop()
