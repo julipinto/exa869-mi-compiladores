@@ -21,8 +21,11 @@ procedure start {  // comeca aqui o programa principal
 		print("vai trabalhar"); // hehehe
 	}	
  
-} 
+} */
 
-int .. a , b*/
+//int .. a , b
 
-teste(oi,ola,t(2,i,outra_funcao()))
+//teste(oi,ola,t(2,i,outra_funcao()))
+
+d = a[2]
+//a[2]

@@ -1,18 +1,7 @@
-28 IDE teste
-28 DEL (
-28 IDE oi
-28 DEL ,
-28 IDE ola
-28 DEL ,
-28 IDE t
-28 DEL (
-28 NRO 2
-28 DEL ,
-28 IDE i
-28 DEL ,
-28 IDE outra_funcao
-28 DEL (
-28 DEL )
-28 DEL )
-28 DEL )
+30 IDE d
+30 REL =
+30 IDE a
+30 DEL [
+30 NRO 2
+30 DEL ]
 

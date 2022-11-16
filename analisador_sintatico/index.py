@@ -15,11 +15,15 @@ tokens = run_lexical()
 ACR_CCA = AcronymsEnum.CHARACTER_CHAIN.value
 ACR_IDE = AcronymsEnum.IDENTIFIER.value
 ACR_NUM = AcronymsEnum.NUMBER.value
+ACR_REL = AcronymsEnum.RELATIONAL_OPERATOR.value
 
 ############################################### AUXILIAR FUNCTIONS ###############################################
 
 def is_type(token):
   return token in ['int', 'real', 'boolean', 'string']
+
+def is_boolean(token):
+  return token in ['true', 'false']
 
 def red_painting(word): 
   #painting a word in red on terminal
@@ -576,6 +580,59 @@ def validate_grammar_function_return(index_token):
   print(blue_painting(getframeinfo(currentframe()).lineno), acc)
   return index_token, acc
 
+def validate_arg_relational_expression(index_token, return_value = False):
+  [_, acronym, lexeme] = tokens[index_token]
+
+  if(acronym == ACR_CCA or acronym == ACR_NUM or acronym == is_boolean(lexeme)):
+    return index_token, lexeme
+
+  elif(acronym == ACR_IDE):
+    [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
+
+    if(next_acronym == ACR_REL): return index_token, lexeme
+
+    elif(next_lexeme == '.'): return validate_compound_type(index_token)
+
+    elif(next_lexeme == '['): return validate_matrix(index_token)
+
+    else:
+      print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(next_line + 1))
+      return index_token, lexeme
+
+  # validar <RetornoFuncao> | '(' <ExpressaoRelacional> ')' | '(' <Expressao> ')' | '(' <ExpressaoLogica> ')
+
+def validate_grammar_relational_expression(index_token):
+  expecting = create_stack(['<relational_value>', 'REL', '<relational_value>'])
+  acc = ""
+
+  while index_token < len(tokens) and len(expecting) > 0:
+    [line, acronym, lexeme] = tokens[index_token]
+    next_expect = expecting[-1]
+
+    if(next_expect == '<relational_value>'):
+      (index_token, accum) = validate_arg_relational_expression(index_token)
+      if(accum != False):
+        expecting.pop()
+        acc += accum
+      else:
+        print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+        acc += red_painting(lexeme)
+
+    elif(next_expect in [acronym, lexeme]):
+      expecting.pop()
+      acc += lexeme
+
+    else:
+      acc += red_painting(lexeme)
+      print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+
+    if(len(expecting) > 0):
+      index_token += 1
+
+  print_if_missing_expecting(expecting)
+  
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
+  return index_token, acc
 ############################################### MAIN ###############################################
 
 def run_sintatic():
@@ -609,19 +666,34 @@ def run_sintatic():
     elif(is_type(lexeme)):
       (index_token, production) = validate_grammar_variable_declaration(index_token)
 
-    elif (acronym == ACR_IDE): 
-      [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
+    # este else analisa as produções não identificadas anteriormente e que provavelmente são
+    # alguma das expressões (relacional, aritmetica ou lógica)
+    else:
+      is_expression = False
 
-      if(next_lexeme == '['):
-        (index_token, production) = validate_matrix(index_token)
-      elif(next_lexeme == '.'):
-        (index_token, production) = validate_compound_type(index_token)
-      elif(next_lexeme == '('):
-        (index_token, production) = validate_grammar_function_return(index_token)
-      elif(next_lexeme == 'extends'):
-        (index_token, production) = validate_grammar_extends(index_token)
+      # tenta identificar se o argumento antes do acronym é valido na expressao relacional
+      (index, production) = validate_arg_relational_expression(index_token)
 
-    
+      # verifica se o acronym depois do argumento válido é um relacional
+      # isso identifica a expressão como relacional
+      if(tokens[index+1][1] == ACR_REL):
+        (index_valid, production) = validate_grammar_relational_expression(index_token)
+        is_expression = True
+        index_token = index_valid + 1
+        #TODO: corrigir index que está sendo necessário acrescimo
+
+    # elif (acronym == ACR_IDE): 
+    #   [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
+
+    #   if(next_lexeme == '['):
+    #     (index_token, production) = validate_matrix(index_token)
+    #   elif(next_lexeme == '.'):
+    #     (index_token, production) = validate_compound_type(index_token)
+    #   elif(next_lexeme == '('):
+    #     (index_token, production) = validate_grammar_function_return(index_token)
+    #   elif(next_lexeme == 'extends'):
+    #     (index_token, production) = validate_grammar_extends(index_token)
+
     index_token += 1
 
 if __name__ == '__main__':

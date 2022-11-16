@@ -12,6 +12,7 @@
     variaveis
   struct
   extends
+  chamada de função
 
 - +/- Feito, precisa consertar 
   declaração de variável --> falta fazer atribuição ao declarar
@@ -27,7 +28,6 @@
   expressão relacional
   declaração de função
   lista de parametros
-  chamada de função
   bloco
   expressao do inicio
 
