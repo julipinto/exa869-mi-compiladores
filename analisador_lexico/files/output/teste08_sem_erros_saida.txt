@@ -1,7 +1,9 @@
-30 IDE d
-30 REL =
-30 IDE a
-30 DEL [
-30 NRO 2
-30 DEL ]
+31 IDE oi
+31 LOG ||
+31 IDE ola
+31 LOG &&
+31 LOG !
+31 IDE a
+31 LOG &&
+31 PRE false
 

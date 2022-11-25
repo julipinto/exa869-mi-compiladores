@@ -27,7 +27,11 @@ procedure start {  // comeca aqui o programa principal
 
 //teste(oi,ola,t(2,i,outra_funcao()))
 
-d = a[2]
+//d = a[2]
 //oi || ola && !a && false
 //oi || ola && !a
 //oi || ola
+
+//(2+(3*4)/(6))
+
+//s+2/2/w

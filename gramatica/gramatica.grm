@@ -29,11 +29,12 @@ CAC = '"'({Letter} | {Digit} | {Simbolo} | [ ])* '"'
 *!
 
 <SimboloSomaSub> ::= '+' | '-'
+<SimboloMultDiv> ::= '*' | '/'
 <Operavel> ::= IDE | NRO
 
 ! Expressao Aritmetica
-<Expressao> ::= <ExpressaoMulti> <SimboloSomaSub> <Expressao> | <ExpressaoMulti>
-<ExpressaoMulti>   ::= <Valor> '*' <ExpressaoMulti> | <Valor> '/' <ExpressaoMulti> | <Valor>
+<Expressao> ::= <Expressao> <SimboloSomaSub> <Expressao> | <ExpressaoMulti>
+<ExpressaoMulti>   ::= <Valor> <SimboloMultDiv> <ExpressaoMulti> | <Valor>
 <Valor> ::= <Operavel> | '(' <Expressao> ')'
 
 ! Expressaõ relacional Falta verificar

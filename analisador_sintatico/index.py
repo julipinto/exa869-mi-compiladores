@@ -17,6 +17,7 @@ ACR_IDE = AcronymsEnum.IDENTIFIER.value
 ACR_NUM = AcronymsEnum.NUMBER.value
 ACR_REL = AcronymsEnum.RELATIONAL_OPERATOR.value
 ACR_LOG = AcronymsEnum.LOGICAL_OPERATOR.value
+ACR_ART = AcronymsEnum.ARITHMETIC_OPERATOR.value
 
 ############################################### AUXILIAR FUNCTIONS ###############################################
 
@@ -537,6 +538,8 @@ def validate_grammar_procedure_declaration():
   return index_token, acc
 
 
+########################################### FUNCTIONS RETURN #############################################
+
 def validate_grammar_function_return(index_token):
   expecting = create_stack(['IDE', '(', '<optional_params>', ')'])
   acc = ""
@@ -607,7 +610,15 @@ def validate_arg_relational_expression(index_token, return_error = True):
         print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(next_line + 1))
       return index_token, lexeme
 
+  else:
+    if(return_error):
+      print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(next_line + 1))
+    return index_token, lexeme
+
   # validar <RetornoFuncao> | '(' <ExpressaoRelacional> ')' | '(' <Expressao> ')' | '(' <ExpressaoLogica> ')
+
+
+########################################### RELATIONAL EXPRESSIONS #############################################
 
 def validate_grammar_relational_expression(index_token):
   expecting = create_stack(['<relational_value>', 'REL', '<relational_value>'])
@@ -645,7 +656,7 @@ def validate_grammar_relational_expression(index_token):
   return index_token, acc
 
 
-def validate_arg_logical_expression(valid_args_list, index_token):
+def validate_arg_logical_expression(valid_args_list, index_token, return_error = True):
   # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
   [_, acronym, lexeme] = tokens[index_token]
 
@@ -654,7 +665,32 @@ def validate_arg_logical_expression(valid_args_list, index_token):
 
   elif(lexeme in valid_args_list and is_boolean(lexeme)):
     return index_token, lexeme
+  else:
+    # if(return_error):
+    #   print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(next_line + 1))
+    return index_token, lexeme
 
+def validate_arg_arithmetic_expression(valid_args_list, index_token, return_error = True):
+  # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
+  [_, acronym, lexeme] = tokens[index_token]
+  has_parentheses = True
+
+  if(not return_error):
+    while(has_parentheses):
+        if(lexeme == '('):
+          index_token += 1
+          [_, acronym, lexeme] = tokens[index_token]
+        else:
+          has_parentheses = False
+
+  if(ACR_IDE in valid_args_list and acronym == ACR_IDE):
+    return index_token, lexeme
+
+  elif(ACR_NUM in valid_args_list and acronym == ACR_NUM):
+    return index_token, lexeme
+  return index_token, lexeme
+
+########################################### LOGICAL EXPRESSIONS #############################################
 
 def validate_grammar_logical_expression(index_token):
   expecting = create_stack(['<logical_value>', 'LOG', '<logical_value>'])
@@ -711,6 +747,97 @@ def validate_grammar_logical_expression(index_token):
   
   print(blue_painting(getframeinfo(currentframe()).lineno), acc)
   return index_token, acc
+
+
+############################################# ARITHMETIC EXPRESSIONS #############################################
+
+# (2+3)
+def validate_grammar_arithmetic_expression(index_token):
+  expecting = create_stack(['<value>', 'ART', '<value>'])
+  acc = ""
+  parentheses = []
+  has_parentheses = True
+  finsh = False
+
+  while not finsh and index_token < len(tokens):
+    [line, acronym, lexeme] = tokens[index_token]
+
+    # controle de parenteses na expressão
+    while(has_parentheses):
+      if(lexeme == '('):
+        index_token += 1
+        acc += '('
+        parentheses.append(')')
+        [line, acronym, lexeme] = tokens[index_token]
+      else:
+        has_parentheses = False
+
+    if(len(expecting) == 0):
+      has_parentheses = True
+      while(index_token < len(tokens) and len(parentheses) > 0 and has_parentheses):
+          if(tokens[index_token][2] == ')'):
+            index_token += 1
+            acc += ')'
+            parentheses.pop()
+          else:
+            has_parentheses = False
+      
+      if(index_token + 1 < len(tokens) and tokens[index_token][1] == 'ART'):
+        expecting = create_stack(['ART', '<value>'])
+      else:
+        finsh = True
+        continue
+    else:
+      [line, acronym, lexeme] = tokens[index_token]
+      next_expect = expecting[-1]
+
+      if(next_expect == '<value>'):
+        valid_args = [ACR_IDE, ACR_NUM]
+        # valid_args.extend(IDE_PRODUCTIONS)
+        (index_token, accum) = validate_arg_arithmetic_expression(valid_args, index_token)
+        if(accum != False):
+          expecting.pop()
+          acc += accum
+        else:
+          print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+          acc += red_painting(lexeme)
+
+      elif(next_expect == acronym and ('+', '-', '*', '/')):
+        expecting.pop()
+        acc += lexeme
+
+      elif(index_token-1 >= len(parentheses) and len(parentheses) > 0 and tokens[index_token][2] == ')' and (tokens[index_token-1][2] == ')' or tokens[index_token-1][1] in ['IDE', 'NRO'])):
+        print(tokens[index_token])
+        acc += ')'
+        parentheses.pop()
+        index_token += 1
+
+      else:
+        acc += red_painting(lexeme)
+        print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+
+      if(len(expecting) > 0):
+        has_parentheses = True
+        index_token += 1
+      else:
+        index_token += 1
+
+  # controle de parenteses na expressão
+  while(index_token < len(tokens) and len(parentheses) > 0):
+    if(tokens[index_token][2] == ')'):
+      index_token += 1
+      acc += ')'
+      parentheses.pop()
+    else:
+      print_if_missing_expecting(')')
+
+  print_if_missing_expecting(parentheses)
+  print_if_missing_expecting(expecting)
+  
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
+  return index_token, acc
+
+
 ############################################### MAIN ###############################################
 
 def run_sintatic():
@@ -761,11 +888,21 @@ def run_sintatic():
       
       if(not is_expression):
         # tenta identificar se o argumento antes do acronym é valido na expressão lógica
-        (index, production) = validate_arg_logical_expression([ACR_IDE, 'true', 'false'], index_token)
+        (index, production) = validate_arg_logical_expression([ACR_IDE, 'true', 'false'], index_token, return_error = False)
         # verifica se o acronym depois do argumento válido é um lógico
         # isso identifica a expressão como relacional
         if(index+1 < len(tokens) and tokens[index+1][1] == ACR_LOG):
           (index_valid, production) = validate_grammar_logical_expression(index_token)
+          is_expression = True
+          index_token = index_valid
+
+      if(not is_expression):
+        # tenta identificar se o argumento antes do acronym é valido na expressão lógica
+        (index, production) = validate_arg_arithmetic_expression([ACR_IDE, ACR_NUM], index_token, return_error = False)
+        # verifica se o acronym depois do argumento válido é um lógico
+        # isso identifica a expressão como relacional
+        if(index+1 < len(tokens) and tokens[index+1][1] == ACR_ART):
+          (index_valid, production) = validate_grammar_arithmetic_expression(index_token)
           is_expression = True
           index_token = index_valid
 

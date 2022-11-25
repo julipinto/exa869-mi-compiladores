@@ -15,6 +15,7 @@
   chamada de função
   expressão lógica
   expressão relacional
+  expressão aritmética
 
 - +/- Feito, precisa consertar 
   declaração de variável --> falta fazer atribuição ao declarar
@@ -22,10 +23,11 @@
   while --> Validar a expressão e o bloco
   procedimento --> Validar a expressão e o bloco
   retorno de função
+  expressão lógica -> falta validar alguns itens
+  expressão relacional -> falta validar alguns itens
 
 - Falta fazer
 
-  expressão aritmética
   declaração de função
   lista de parametros
   bloco
