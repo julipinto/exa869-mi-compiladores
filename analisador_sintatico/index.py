@@ -822,14 +822,14 @@ def validate_grammar_arithmetic_expression(index_token):
       else:
         index_token += 1
 
-  # controle de parenteses na expressão
-  while(index_token < len(tokens) and len(parentheses) > 0):
-    if(tokens[index_token][2] == ')'):
-      index_token += 1
-      acc += ')'
-      parentheses.pop()
-    else:
-      print_if_missing_expecting(')')
+  # # controle de parenteses na expressão
+  # while(index_token < len(tokens) and len(parentheses) > 0):
+  #   if(tokens[index_token][2] == ')'):
+  #     index_token += 1
+  #     acc += ')'
+  #     parentheses.pop()
+  #   else:
+  #     print_if_missing_expecting(')')
 
   print_if_missing_expecting(parentheses)
   print_if_missing_expecting(expecting)
