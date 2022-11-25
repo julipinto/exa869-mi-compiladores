@@ -13,6 +13,8 @@
   struct
   extends
   chamada de função
+  expressão lógica
+  expressão relacional
 
 - +/- Feito, precisa consertar 
   declaração de variável --> falta fazer atribuição ao declarar
@@ -24,8 +26,6 @@
 - Falta fazer
 
   expressão aritmética
-  expressão lógica
-  expressão relacional
   declaração de função
   lista de parametros
   bloco
