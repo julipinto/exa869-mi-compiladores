@@ -653,6 +653,15 @@ def validate_grammar_function_return(index_token):
 
 def validate_arg_relational_expression(index_token, return_error = True):
   [_, acronym, lexeme] = tokens[index_token]
+  has_parentheses = True
+
+  if(not return_error):
+    while(has_parentheses):
+        if(lexeme == '('):
+          index_token += 1
+          [_, acronym, lexeme] = tokens[index_token]
+        else:
+          has_parentheses = False
 
   if(acronym == ACR_CCA or acronym == ACR_NUM or acronym == is_boolean(lexeme)):
     return index_token, lexeme
@@ -697,40 +706,40 @@ def validate_arg_relational_expression(index_token, return_error = True):
 
 ########################################### RELATIONAL EXPRESSIONS #############################################
 
-def validate_grammar_relational_expression(index_token):
-  expecting = create_stack(['<relational_value>', 'REL', '<relational_value>'])
-  acc = ""
+# def validate_grammar_relational_expression(index_token):
+#   expecting = create_stack(['<relational_value>', 'REL', '<relational_value>'])
+#   acc = ""
 
-  while index_token < len(tokens) and len(expecting) > 0:
-    [line, acronym, lexeme] = tokens[index_token]
-    next_expect = expecting[-1]
+#   while index_token < len(tokens) and len(expecting) > 0:
+#     [line, acronym, lexeme] = tokens[index_token]
+#     next_expect = expecting[-1]
 
-    if(next_expect == '<relational_value>'):
-      #valid_args = [ACR_CCA, ACR_NUM, ACR_IDE, 'MATRIX', 'COMPOUND_TYPE', 'BOOLEAN']
-      #(index_token, accum) = validate_arg(valid_args, index_token, end_ide = '_REL')
-      (index_token, accum) = validate_arg_relational_expression(index_token)
-      if(accum != False):
-        expecting.pop()
-        acc += accum
-      else:
-        print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
-        acc += red_painting(lexeme)
+#     if(next_expect == '<relational_value>'):
+#       #valid_args = [ACR_CCA, ACR_NUM, ACR_IDE, 'MATRIX', 'COMPOUND_TYPE', 'BOOLEAN']
+#       #(index_token, accum) = validate_arg(valid_args, index_token, end_ide = '_REL')
+#       (index_token, accum) = validate_arg_relational_expression(index_token)
+#       if(accum != False):
+#         expecting.pop()
+#         acc += accum
+#       else:
+#         print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+#         acc += red_painting(lexeme)
 
-    elif(next_expect in [acronym, lexeme]):
-      expecting.pop()
-      acc += lexeme
+#     elif(next_expect in [acronym, lexeme]):
+#       expecting.pop()
+#       acc += lexeme
 
-    else:
-      acc += red_painting(lexeme)
-      print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+#     else:
+#       acc += red_painting(lexeme)
+#       print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
 
-    if(len(expecting) > 0):
-      index_token += 1
+#     if(len(expecting) > 0):
+#       index_token += 1
 
-  print_if_missing_expecting(expecting)
+#   print_if_missing_expecting(expecting)
   
-  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
-  return index_token, acc
+#   print(blue_painting(getframeinfo(currentframe()).lineno), acc)
+#   return index_token, acc
 
 
 def validate_arg_logical_expression(index_token, return_error = True):
@@ -920,6 +929,105 @@ def validate_grammar_arithmetic_expression(index_token):
   
   print(blue_painting(getframeinfo(currentframe()).lineno), acc)
   return index_token, acc
+
+
+
+
+
+
+
+
+def validate_grammar_relational_expression(index_token):
+  expecting = create_stack(['<value>', 'REL', '<value>'])
+  acc = ""
+  parentheses = []
+  has_parentheses = True
+  finsh = False
+
+  while not finsh and index_token < len(tokens):
+    [line, acronym, lexeme] = tokens[index_token]
+
+    # controle de parenteses na expressão
+    while(has_parentheses):
+      if(lexeme == '('):
+        index_token += 1
+        acc += '('
+        parentheses.append(')')
+        [line, acronym, lexeme] = tokens[index_token]
+      else:
+        has_parentheses = False
+
+    if(len(expecting) == 0):
+      has_parentheses = True
+      # controle de parenteses na expressão
+      while(index_token < len(tokens) and len(parentheses) > 0 and has_parentheses):
+          if(tokens[index_token][2] == ')'):
+            index_token += 1
+            acc += ')'
+            parentheses.pop()
+          else:
+            has_parentheses = False
+      
+      if(index_token + 1 < len(tokens) and tokens[index_token][1] == 'REL'):
+        expecting = create_stack(['REL', '<value>'])
+      else:
+        finsh = True
+        continue
+    else:
+      [line, acronym, lexeme] = tokens[index_token]
+      next_expect = expecting[-1]
+
+      if(next_expect == '<value>'):
+        (index_token, accum) = validate_arg_relational_expression(index_token)
+        
+        if(accum != False):
+          expecting.pop()
+          acc += accum
+        else:
+          print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+          acc += red_painting(lexeme)
+
+      elif(next_expect in [acronym, lexeme]):
+        expecting.pop()
+        acc += lexeme
+
+      elif(index_token-1 >= len(parentheses) and len(parentheses) > 0 and tokens[index_token][2] == ')' and (tokens[index_token-1][2] == ')' or tokens[index_token-1][1] in ['IDE', 'NRO'])):
+        acc += ')'
+        parentheses.pop()
+        index_token += 1
+
+      else:
+        acc += red_painting(lexeme)
+        print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+
+      if(len(expecting) > 0):
+        has_parentheses = True
+        index_token += 1
+      else:
+        index_token += 1
+
+  # # controle de parenteses na expressão
+  # while(index_token < len(tokens) and len(parentheses) > 0):
+  #   if(tokens[index_token][2] == ')'):
+  #     index_token += 1
+  #     acc += ')'
+  #     parentheses.pop()
+  #   else:
+  #     print_if_missing_expecting(')')
+
+  print_if_missing_expecting(parentheses)
+  print_if_missing_expecting(expecting)
+  
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
+  return index_token, acc
+
+
+
+
+
+
+
+
 
 
 def validate_arg_function_content(index_token):
@@ -1241,6 +1349,7 @@ def run_sintatic():
       (index, production) = validate_arg_relational_expression(index_token, return_error = False)
       # verifica se o acronym depois do argumento válido é um relacional
       # isso identifica a expressão como relacional
+      
       if(index+1 < len(tokens) and tokens[index+1][1] == ACR_REL):
         (index_valid, production) = validate_grammar_relational_expression(index_token)
         is_expression = True

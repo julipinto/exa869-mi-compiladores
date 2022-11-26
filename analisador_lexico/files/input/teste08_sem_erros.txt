@@ -29,7 +29,7 @@ procedure start {  // comeca aqui o programa principal
 
 //print oi);
 //d = a[2]
-//d == 2
+(d == 2)
 //d=s
 //oi || ola && !a && false || oi(ola) && a == b
 //oi || ola && !a
@@ -39,7 +39,7 @@ procedure start {  // comeca aqui o programa principal
 
 //s+2/2/w
 
-procedure proc (boolean b, int teste) {print(d); outra_funcao();}
+//procedure proc (boolean b, int teste) {print(d); outra_funcao();}
 /*function boolean funcao(boolean b, int teste, real numero, string nome){
 
 	outra_funcao();
@@ -50,6 +50,6 @@ procedure proc (boolean b, int teste) {print(d); outra_funcao();}
 
 {print(d); outra_funcao();}*/
 
-function start(){
+/*function start(){
 	outra_funcao();
-}
+}*/
