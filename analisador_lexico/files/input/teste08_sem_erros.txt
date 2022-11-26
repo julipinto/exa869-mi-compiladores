@@ -23,13 +23,14 @@ procedure start {  // comeca aqui o programa principal
  
 } */
 
+if ((a==b) && true) then {outra_funcao();}
 //int .. a , b
 
 //teste(oi,ola,t(2,i,outra_funcao()))
 
 //print oi);
 //d = a[2]
-(d == 2)
+(d == 2 )
 //d=s
 //oi || ola && !a && false || oi(ola) && a == b
 //oi || ola && !a

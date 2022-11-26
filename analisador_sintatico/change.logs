@@ -10,6 +10,7 @@
   chamada de função
   expressão lógica
   expressão aritmética
+  procedimento
 
 - Produções que precisam de correção/finalização ou serem testadas
   variáveis globais
@@ -23,8 +24,6 @@
   declaração de variável --> falta fazer atribuição ao declarar
   if --> Validar a expressão e o bloco, fazer o else
   while --> Validar a expressão e o bloco
-  procedimento --> Validar a expressão e o bloco
-  retorno de função
 
   ## Revisar todos os erros numa saída mais comum
   ===================================================================

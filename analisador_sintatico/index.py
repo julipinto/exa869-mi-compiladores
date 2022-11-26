@@ -9,6 +9,9 @@ from inspect import currentframe, getframeinfo
 
 from analisador_lexico.index import AcronymsEnum, run_lexical
 
+from helper import *
+from validates_args import *
+
 tokens = run_lexical()
 
 ############################################### ACRONYMS CONSTANTS ###############################################
@@ -18,35 +21,6 @@ ACR_NUM = AcronymsEnum.NUMBER.value
 ACR_REL = AcronymsEnum.RELATIONAL_OPERATOR.value
 ACR_LOG = AcronymsEnum.LOGICAL_OPERATOR.value
 ACR_ART = AcronymsEnum.ARITHMETIC_OPERATOR.value
-
-############################################### AUXILIAR FUNCTIONS ###############################################
-
-def is_type(token):
-  return token in ['int', 'real', 'boolean', 'string']
-
-def is_logical(token):
-  return token in ['&&', '||']
-
-def is_boolean(token):
-  return token in ['true', 'false']
-
-def red_painting(word): 
-  #painting a word in red on terminal
-  return '\033[1;31m' + str(word) + '\033[0;0m'
-
-def blue_painting(word): 
-  #painting a word in blue on terminal
-  return '\033[1;34m' + str(word) + '\033[0;0m'
-
-
-def print_if_missing_expecting(expecting_stack):
-  if(len(expecting_stack) > 0):
-    expecting_stack.reverse()
-    print('Error: missing tokens ' + str(expecting_stack))
-
-def create_stack(arr):
-  arr.reverse()
-  return arr
 
 IDE_PRODUCTIONS = ['IDE', 'MATRIX', 'COMPOUND_TYPE']
 
@@ -313,10 +287,31 @@ def validate_grammar_while(index_token):
   print(blue_painting(getframeinfo(currentframe()).lineno), acc)
   return index_token, acc
 
+
+def validate_arg_if(index_token):
+  [_, acronym, lexeme] = tokens[index_token]
+
+  if(index_token + 1 < len(tokens) and tokens[index_token+1][2] != ')'):
+    (index, production) = validate_arg_relational_expression(index_token, return_error = False)
+    
+    if(index+1 < len(tokens) and tokens[index+1][1] == ACR_REL):
+      return validate_grammar_relational_expression(index_token)
+      # index_token = index_valid + 1 #TODO: corrigir index que está sendo necessário acrescimo
+    
+    # tenta identificar se o argumento antes do acronym é valido na expressão lógica
+    (index, production) = validate_arg_logical_expression(index_token, return_error = False)
+
+    if(index+1 < len(tokens) and tokens[index+1][1] == ACR_LOG):
+      return validate_grammar_logical_expression(index_token)
+
+  elif(is_boolean(lexeme) or acronym == ACR_IDE):
+    return index_token, lexeme
+
+  
 ###############################################  ###############################################
 # TODO: else
 def validate_grammar_if(index_token):
-  expecting = create_stack(['if', '(', '<exp>', ')', 'then', '<block>'])
+  expecting = create_stack(['if', '(', '<exp>', ')', 'then', '<block>', '<optional_else>'])
   acc = ""
 
   while index_token < len(tokens) and len(expecting) > 0:
@@ -324,8 +319,14 @@ def validate_grammar_if(index_token):
     next_expect = expecting[-1]
 
     if(next_expect == '<exp>'):
-      expecting.pop()
-      acc += lexeme
+      (index_token, accum) = validate_arg_if(index_token)
+      index_token -= 1
+      if(accum != False):
+        acc += accum
+        expecting.pop()
+      else:
+        print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+        acc += red_painting(lexeme)
 
     elif(next_expect == '<block>'):
       (index_token, accum) = validate_grammar_block(index_token)
@@ -336,6 +337,12 @@ def validate_grammar_if(index_token):
         print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
         acc += red_painting(lexeme)
 
+    elif(next_expect == '<optional_else>'):
+      if(lexeme == 'else'):
+        index_token -= 1
+        expecting = create_stack(['else', '<block>'])
+      else:
+        expecting.pop()
     elif(next_expect == lexeme):
       expecting.pop()
       acc += lexeme
