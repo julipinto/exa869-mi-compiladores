@@ -44,4 +44,8 @@ d = a[2]
 	return 8;
 }*/
 
-{print(d);}
+//{print(d);}
+
+function start(){
+	outra_funcao();
+}

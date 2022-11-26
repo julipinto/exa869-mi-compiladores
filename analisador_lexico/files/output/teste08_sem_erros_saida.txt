@@ -4,11 +4,14 @@
 30 DEL [
 30 NRO 2
 30 DEL ]
-47 DEL {
-47 PRE print
-47 DEL (
-47 IDE d
-47 DEL )
-47 DEL ;
-47 DEL }
+49 PRE function
+49 PRE start
+49 DEL (
+49 DEL )
+49 DEL {
+50 IDE outra_funcao
+50 DEL (
+50 DEL )
+50 DEL ;
+51 DEL }
 

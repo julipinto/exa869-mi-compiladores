@@ -17,6 +17,8 @@
   expressão relacional
   expressão aritmética
   declaração de função
+  bloco
+  funcao principal start
 
 - +/- Feito, precisa consertar 
   declaração de variável --> falta fazer atribuição ao declarar
@@ -27,10 +29,6 @@
   expressão lógica -> falta validar alguns itens
   expressão relacional -> falta validar alguns itens
 
-- Falta fazer
-
-  bloco
-  funcao principal start
 
   ## Revisar todos os erros numa saída mais comum
   ===================================================================
