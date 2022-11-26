@@ -1,11 +1,5 @@
 26 PRE if
 26 DEL (
-26 DEL (
-26 IDE a
-26 REL ==
-26 IDE b
-26 DEL )
-26 LOG &&
 26 PRE true
 26 DEL )
 26 PRE then

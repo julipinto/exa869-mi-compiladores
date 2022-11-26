@@ -263,8 +263,14 @@ def validate_grammar_while(index_token):
     next_expect = expecting[-1]
 
     if(next_expect == '<exp>'):
-      expecting.pop()
-      acc += lexeme
+      (index_token, accum) = validate_arg_if_while(index_token)
+      index_token -= 1
+      if(accum != False):
+        acc += accum
+        expecting.pop()
+      else:
+        print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+        acc += red_painting(lexeme)
 
     elif(next_expect == '<block>'):
       expecting.pop()
@@ -288,7 +294,7 @@ def validate_grammar_while(index_token):
   return index_token, acc
 
 
-def validate_arg_if(index_token):
+def validate_arg_if_while(index_token):
   [_, acronym, lexeme] = tokens[index_token]
 
   if(index_token + 1 < len(tokens) and tokens[index_token+1][2] != ')'):
@@ -305,7 +311,7 @@ def validate_arg_if(index_token):
       return validate_grammar_logical_expression(index_token)
 
   elif(is_boolean(lexeme) or acronym == ACR_IDE):
-    return index_token, lexeme
+    return index_token+1, lexeme
 
   
 ###############################################  ###############################################
@@ -319,7 +325,7 @@ def validate_grammar_if(index_token):
     next_expect = expecting[-1]
 
     if(next_expect == '<exp>'):
-      (index_token, accum) = validate_arg_if(index_token)
+      (index_token, accum) = validate_arg_if_while(index_token)
       index_token -= 1
       if(accum != False):
         acc += accum
