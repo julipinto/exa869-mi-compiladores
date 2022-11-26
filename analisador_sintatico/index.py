@@ -870,14 +870,7 @@ def validate_arg_function_return(index_token):
   if(acronym == ACR_NUM or acronym == ACR_CCA or acronym == ACR_IDE or is_boolean(lexeme)): 
     return (index_token, lexeme)
   return (index_token, lexeme)
-  # elif (acronym == ACR_IDE): 
-  #   [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
-  #   if(next_lexeme == '('):
-  #     (index_token, production) = validate_grammar_function_return(index_token)
-  #     index_token += 1
-  #     if(tokens[index_token][2] == ';'):
-  #       production += ';'
-  #       return (index_token, production)
+
 
 ############################################### FUNCTIONS DECLARATION ###############################################
 
@@ -921,7 +914,6 @@ def validate_grammar_function_declaration(index_token):
         index_token -= 1
         expecting.pop()
       else:
-        # print(expecting)
         expecting.pop()
         continue
     elif(next_expect == '<conteudo>'):
@@ -977,6 +969,77 @@ def validate_grammar_function_declaration(index_token):
   return index_token, acc
 
 
+def validate_arg_block_content(index_token):
+  # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
+  [_, acronym, lexeme] = tokens[index_token]
+
+  if(lexeme == 'print'): 
+    return validate_grammar_print(index_token)
+
+  elif (lexeme == 'read'):
+    return validate_grammar_read(index_token)
+
+  elif (lexeme == 'while'):
+    return validate_grammar_while(index_token)
+
+  elif (lexeme == 'if'):
+    return validate_grammar_if(index_token)
+
+  elif (acronym == ACR_IDE): 
+    [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
+    if(next_lexeme == '('):
+      (index_token, production) = validate_grammar_function_return(index_token)
+      index_token += 1
+      if(tokens[index_token][2] == ';'):
+        production += ';'
+        return (index_token, production)
+
+############################################### BLOCK ###############################################
+
+def validate_grammar_block(index_token):
+  expecting = create_stack(['{', '<content>', '}'])
+  acc = ""
+
+  while index_token < len(tokens) and len(expecting) > 0:
+    [line, _, lexeme] = tokens[index_token]
+    next_expect = expecting[-1]
+
+    if(next_expect == '<content>'):
+      more_content = True
+      while(more_content):
+        (index_token, accum) = validate_arg_block_content(index_token)
+        if(accum != False):
+          acc += accum
+        else:
+          print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+          acc += red_painting(lexeme)
+        if(tokens[index_token+1][2] == '}'):
+          more_content = False
+        else:
+          index_token += 1
+      if(accum != False):
+        expecting.pop()
+      else:
+        print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+        acc += red_painting(lexeme)
+
+    elif(next_expect == lexeme):
+      expecting.pop()
+      acc += lexeme
+
+    else:
+      acc += red_painting(lexeme)
+      print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+    
+    if(len(expecting) > 0):
+      index_token += 1
+
+
+  print_if_missing_expecting(expecting)
+  
+  print(blue_painting(getframeinfo(currentframe()).lineno), acc)
+  return index_token, acc
+
 ############################################### MAIN ###############################################
 
 def run_sintatic():
@@ -1010,6 +1073,8 @@ def run_sintatic():
     elif(lexeme == 'const' or lexeme == 'var'):
       (index_token, production) = validate_grammar_global_variable_declaration(index_token)
 
+    elif(lexeme == '{'): #TODO: elif apenas para testar bloco
+      (index_token, production) = validate_grammar_block(index_token)
     elif(is_type(lexeme)):
       (index_token, production) = validate_grammar_variable_declaration(index_token)
 
