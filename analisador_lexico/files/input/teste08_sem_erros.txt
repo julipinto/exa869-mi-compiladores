@@ -27,9 +27,10 @@ procedure start {  // comeca aqui o programa principal
 
 //teste(oi,ola,t(2,i,outra_funcao()))
 
-d = a[2]
-//oi || ola && !a && false
-//oi || ola && !a
+//print oi);
+//d = a[2]
+oi || ola && !a && false || oi(ola) && a == b
+oi || ola && !a
 //oi || ola
 
 //(2+(3*4)/(6))
@@ -46,6 +47,6 @@ d = a[2]
 
 //{print(d);}
 
-function start(){
+/*function start(){
 	outra_funcao();
-}
+}*/
