@@ -16,6 +16,7 @@
   expressão lógica
   expressão relacional
   expressão aritmética
+  declaração de função
 
 - +/- Feito, precisa consertar 
   declaração de variável --> falta fazer atribuição ao declarar
@@ -28,8 +29,6 @@
 
 - Falta fazer
 
-  declaração de função
-  lista de parametros
   bloco
   expressao do inicio
 
