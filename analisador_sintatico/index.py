@@ -366,6 +366,12 @@ def validate_grammar_if(index_token):
   print(blue_painting(getframeinfo(currentframe()).lineno), acc)
   return index_token, acc
 
+def validate_variable_assignment(index_token):
+  [_, acronym, lexeme] = tokens[index_token]
+  
+  if(acronym == ACR_IDE or acronym == ACR_NUM or is_boolean(lexeme)):
+    return (index_token, lexeme)
+
 ############################################### VARIABLE DECLARATION ###############################################
 #FIXME: permitir atribuir valores a variáveis (int a = 1, b = 2;)
 
@@ -381,16 +387,27 @@ def validate_grammar_variable_declaration(index_token):
   expecting = create_stack(['IDE', '<may_have_more>', ';'])
 
   while(len(expecting) > 0 and index_token + 1 <= len(tokens)):
-    [_, acronym, lexeme] = tokens[index_token]
+    [line, acronym, lexeme] = tokens[index_token]
     next_expect = expecting[-1]
-    
+
     if(next_expect == '<may_have_more>'):
       if(lexeme == ','):
         expecting = create_stack(['IDE', '<may_have_more>', ';'])
         acc += lexeme + ' '
+      elif(lexeme == '='):
+        expecting = create_stack(['<value>', '<may_have_more>', ';'])
+        acc += lexeme
       else:
         expecting.pop()
         continue
+    elif(next_expect == '<value>'):
+      (index_token, accum) = validate_variable_assignment(index_token)
+      if(accum != False):
+        acc += accum
+        expecting.pop()
+      else:
+        print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+        acc += red_painting(lexeme)
     elif(next_expect in [acronym, lexeme]):
       expecting.pop()
       acc += lexeme + ' '
@@ -488,6 +505,7 @@ def validate_grammar_extends(index_token):
 
 ############################################### GLOBAL VARIABLE ###############################################
 def validate_grammar_global_variable_declaration(index_token):
+  
   expecting = create_stack(['<init>', '{', '<all_vars>', '}'])
   acc = ""
 

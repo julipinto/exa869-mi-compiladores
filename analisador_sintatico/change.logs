@@ -21,9 +21,9 @@
   declaração de função
   bloco
   funcao principal start
-  declaração de variável --> falta fazer atribuição ao declarar
-  if --> Validar a expressão e o bloco, fazer o else
-  while --> Validar a expressão e o bloco
+  declaração de variável
+  if --> Validar a expressão
+  while --> Validar a expressão
 
   ## Revisar todos os erros numa saída mais comum
   ===================================================================
