@@ -50,7 +50,14 @@ procedure start {  // comeca aqui o programa principal
 	return 8;
 }*/
 
-while (b){
+var {
+	string l = (2+(3*4)/(p)),
+	r = oi || ola && !a && false || oi(ola) && a == b,
+	//s = w[2],
+	f = (d == 2 );
+};
+
+/*while (b){
 	print (oi);
 	read (oi);
 	teste(oi,ola,t(2,i,outra_funcao()));
@@ -60,7 +67,43 @@ while (b){
 		string d= 3, d=4;
 		int s;
 	};
-	const {
+	var {
+		boolean d= 3, d=4;
+		int s;
+	};
+
+	if (true) then {
+		outra_funcao();
+	} else {
+		funcao();
+	}
+
+	while (b) {
+		outra_funcao();
+	}
+
+	p = 5;
+
+	l = (2+(3*4)/(p));
+
+	r = oi || ola && !a && false || oi(ola) && a == b;
+
+	f = (d == 2 );
+	//s = w[2];
+}*/
+
+/*function start(){
+	while (b){
+	print (oi);
+	read (oi);
+	teste(oi,ola,t(2,i,outra_funcao()));
+	outra_funcao();
+
+	var {
+		string d= 3, d=4;
+		int s;
+	};
+	var {
 		boolean d= 3, d=4;
 		int s;
 	};
@@ -79,9 +122,6 @@ while (b){
 
 	//l = (2+(3*4)/(p));
 }
-
-/*function start(){
-	outra_funcao();
 }*/
 
 /*var { string d= 3, d=4;

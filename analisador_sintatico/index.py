@@ -358,21 +358,27 @@ def validate_grammar_if(index_token):
 def validate_variable_assignment(index_token):
   [_, acronym, lexeme] = tokens[index_token]
 
-  # if(index_token + 1 < len(tokens)):
+  if(index_token + 1 < len(tokens)):
 
-  #   (index, _) = validate_arg_relational_expression(index_token, return_error = False)
+    (index, _) = validate_arg_relational_expression(index_token, return_error = False)
 
-  #   if(index+1 < len(tokens) and tokens[index+1][1] == ACR_REL):
-  #     return validate_grammar_relational_expression(index_token)
+    if(index+1 < len(tokens) and tokens[index+1][1] == ACR_REL):
+      (index_token, accum) = validate_grammar_relational_expression(index_token)
+      index_token -= 1
+      return (index_token, accum)
     
-  #   (index, _) = validate_arg_logical_expression(index_token, return_error = False)
+    (index, _) = validate_arg_logical_expression(index_token, return_error = False)
 
-  #   if(index+1 < len(tokens) and tokens[index+1][1] == ACR_LOG):
-  #     return validate_grammar_logical_expression(index_token)
+    if(index+1 < len(tokens) and tokens[index+1][1] == ACR_LOG):
+      (index_token, accum) = validate_grammar_logical_expression(index_token)
+      index_token -= 1
+      return (index_token, accum)
 
-  #   (index, _) = validate_arg_arithmetic_expression([ACR_IDE, ACR_NUM], index_token, return_error = False)
-  #   if(index+1 < len(tokens) and tokens[index+1][1] == ACR_ART):
-  #     return validate_grammar_arithmetic_expression(index_token)
+    (index, _) = validate_arg_arithmetic_expression([ACR_IDE, ACR_NUM], index_token, return_error = False)
+    if(index+1 < len(tokens) and tokens[index+1][1] == ACR_ART):
+      (index_token, accum) = validate_grammar_arithmetic_expression(index_token)
+      index_token -= 1
+      return (index_token, accum)
 
   if(acronym == ACR_IDE or acronym == ACR_NUM or is_boolean(lexeme)):
     return (index_token, lexeme)
@@ -810,19 +816,20 @@ def validate_arg_logical_expression(index_token, return_error = True):
     return index_token, lexeme
   else:
     if(index_token+1 < len(tokens)):
+
       (index, production) = validate_arg_relational_expression(index_token, return_error = False)
       # verifica se o acronym depois do argumento válido é um relacional
       # isso identifica a expressão como relacional
+      
       if(index+1 < len(tokens) and tokens[index+1][1] == ACR_REL):
-        (index_valid, production) = validate_grammar_relational_expression(index_token)
-        # index_token = index_valid + 1 #TODO: corrigir index que está sendo necessário acrescimo
-        return (index_valid, production)
+        return validate_grammar_relational_expression(index_token)
     # if(return_error):
     #   print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(next_line + 1))
     if(acronym == ACR_IDE):
       if(index_token+1 < len(tokens) and tokens[index_token+1][2] == '('):
         [index_token, lexeme] = validate_grammar_function_return(index_token)
       return index_token, lexeme
+    return index_token, lexeme
 
 def validate_arg_arithmetic_expression(valid_args_list, index_token, return_error = True):
   # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
@@ -983,7 +990,6 @@ def validate_grammar_arithmetic_expression(index_token):
   #     parentheses.pop()
   #   else:
   #     print_if_missing_expecting(')')
-
   print_if_missing_expecting(parentheses)
   print_if_missing_expecting(expecting)
   
@@ -1216,30 +1222,30 @@ def validate_grammar_function_declaration(index_token):
   return index_token, acc
 
 
-def validate_arg_start_content(index_token):
-  # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
-  [_, acronym, lexeme] = tokens[index_token]
+# def validate_arg_start_content(index_token):
+#   # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
+#   [_, acronym, lexeme] = tokens[index_token]
 
-  if(lexeme == 'print'): 
-    return validate_grammar_print(index_token)
+#   if(lexeme == 'print'): 
+#     return validate_grammar_print(index_token)
 
-  elif (lexeme == 'read'):
-    return validate_grammar_read(index_token)
+#   elif (lexeme == 'read'):
+#     return validate_grammar_read(index_token)
 
-  elif (lexeme == 'while'):
-    return validate_grammar_while(index_token)
+#   elif (lexeme == 'while'):
+#     return validate_grammar_while(index_token)
 
-  elif (lexeme == 'if'):
-    return validate_grammar_if(index_token)
+#   elif (lexeme == 'if'):
+#     return validate_grammar_if(index_token)
 
-  elif (acronym == ACR_IDE): 
-    [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
-    if(next_lexeme == '('):
-      (index_token, production) = validate_grammar_function_return(index_token)
-      index_token += 1
-      if(tokens[index_token][2] == ';'):
-        production += ';'
-        return (index_token, production)
+#   elif (acronym == ACR_IDE): 
+#     [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
+#     if(next_lexeme == '('):
+#       (index_token, production) = validate_grammar_function_return(index_token)
+#       index_token += 1
+#       if(tokens[index_token][2] == ';'):
+#         production += ';'
+#         return (index_token, production)
 
 
 ############################################### START FUNCTION ###############################################
@@ -1253,7 +1259,7 @@ def validate_grammar_start_function(index_token):
     next_expect = expecting[-1]
 
     if(next_expect == '<content>'):
-      (index_token, accum) = validate_content(index_token, validate_arg_start_content, '}')
+      (index_token, accum) = validate_content(index_token, validate_arg_block_start_content, '}')
       if(accum != False):
         acc += accum
         expecting.pop()
@@ -1277,7 +1283,7 @@ def validate_grammar_start_function(index_token):
 
 
 
-def validate_arg_block_content(index_token):
+def validate_arg_block_start_content(index_token):
   # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
   [_, acronym, lexeme] = tokens[index_token]
 
@@ -1294,7 +1300,7 @@ def validate_arg_block_content(index_token):
   elif (lexeme == 'if'):
     return validate_grammar_if(index_token)
 
-  elif(lexeme == 'const' or lexeme == 'var'):
+  elif(lexeme == 'var'):
     (index_token, production) = validate_grammar_global_variable_declaration(index_token)
     index_token += 1
     if(tokens[index_token][2] == ';'):
@@ -1320,30 +1326,6 @@ def validate_arg_block_content(index_token):
       if(tokens[index_token][2] == ';'):
         production += ';'
         return (index_token, production)
-  # expressão (aritmetica,logica,relacional)
-
-'''
-      (index, production) = validate_arg_relational_expression(index_token, return_error = False)
-      
-      if(index+1 < len(tokens) and tokens[index+1][1] == ACR_REL):
-        (index_valid, production) = validate_grammar_relational_expression(index_token)
-        is_expression = True
-        index_token = index_valid + 1 #TODO: corrigir index que está sendo necessário acrescimo
-      
-      (index, production) = validate_arg_logical_expression(index_token, return_error = False)
-
-      if(index+1 < len(tokens) and tokens[index+1][1] == ACR_LOG):
-        (index_valid, production) = validate_grammar_logical_expression(index_token)
-        is_expression = True
-        index_token = index_valid
-
-      (index, production) = validate_arg_arithmetic_expression([ACR_IDE, ACR_NUM], index_token, return_error = False)
-
-      if(index+1 < len(tokens) and tokens[index+1][1] == ACR_ART):
-        (index_valid, production) = validate_grammar_arithmetic_expression(index_token)
-        is_expression = True
-        index_token = index_valid
-'''
 
 def validate_content(index_token, validate_function, delimiter):
   [line, _, lexeme] = tokens[index_token]
@@ -1375,7 +1357,7 @@ def validate_grammar_block(index_token):
     next_expect = expecting[-1]
 
     if(next_expect == '<content>'):
-      (index_token, accum) = validate_content(index_token, validate_arg_block_content, '}')
+      (index_token, accum) = validate_content(index_token, validate_arg_block_start_content, '}')
       if(accum != False):
         acc += accum
         expecting.pop()

@@ -19,7 +19,7 @@
   extends
   expressão relacional
   declaração de função
-  bloco
+  bloco (adicionar expressoes)
   funcao principal start
   declaração de variável
   if --> Validar a expressão
