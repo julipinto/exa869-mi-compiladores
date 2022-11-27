@@ -24,6 +24,7 @@ procedure start {  // comeca aqui o programa principal
 } */
 
 //if (true) then {outra_funcao();}
+//if (true) then {outra_funcao();} else {funcao();}
 //int .. a , b
 
 //teste(oi,ola,t(2,i,outra_funcao()))
@@ -47,13 +48,41 @@ procedure start {  // comeca aqui o programa principal
 	t(2,i,outra());
 
 	return 8;
-}
+}*/
 
-{print(d); outra_funcao();}*/
+while (b){
+	print (oi);
+	read (oi);
+	teste(oi,ola,t(2,i,outra_funcao()));
+	outra_funcao();
+
+	var {
+		string d= 3, d=4;
+		int s;
+	};
+	const {
+		boolean d= 3, d=4;
+		int s;
+	};
+
+	if (true) then {
+		outra_funcao();
+	} else {
+		funcao();
+	}
+
+	while (b) {
+		outra_funcao();
+	}
+
+	p = 5;
+
+	//l = (2+(3*4)/(p));
+}
 
 /*function start(){
 	outra_funcao();
 }*/
 
-var { string d= 3, d=4;
-		int s;}
+/*var { string d= 3, d=4;
+		int s;}*/

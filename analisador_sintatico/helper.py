@@ -4,8 +4,14 @@ def is_type(token):
 def is_logical(token):
     return token in ['&&', '||']
 
+def is_relational(token):
+    return token in ('!=', '==', '<', '<=', '>', '>=')
+
 def is_boolean(token):
     return token in ['true', 'false']
+
+def is_sum_or_sub_or_mult_or_div(lexeme):
+    return lexeme in ('+', '-', '*', '/')
 
 def red_painting(word): 
     #painting a word in red on terminal
