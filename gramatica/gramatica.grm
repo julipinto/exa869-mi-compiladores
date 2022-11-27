@@ -49,7 +49,7 @@ CAC = '"'({Letter} | {Digit} | {Simbolo} | [ ])* '"'
 ! <ValorLogico> ::=  IDE | <Boolean> |  <RetornoFuncao> | <ExpressaoRelacional>
 <OperadorLogico> ::=   '&&' <neg> |  '||' <neg>
 <Negacao>::= '!' <ValorRelacional>
- 
+
 
 !* <ExpressaoLogica> ::= <OpBoleana>
          

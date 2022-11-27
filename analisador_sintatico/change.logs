@@ -11,6 +11,8 @@
   expressão lógica
   expressão aritmética
   procedimento
+  bloco
+  funcao principal start
 
 - Produções que precisam de correção/finalização ou serem testadas
   variáveis globais
@@ -19,8 +21,6 @@
   extends
   expressão relacional
   declaração de função
-  bloco (adicionar expressoes)
-  funcao principal start
   declaração de variável
   if --> Validar a expressão
   while --> Validar a expressão

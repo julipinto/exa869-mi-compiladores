@@ -381,6 +381,9 @@ def validate_variable_assignment(index_token):
       return (index_token, accum)
 
   if(acronym == ACR_IDE or acronym == ACR_NUM or is_boolean(lexeme)):
+    if(acronym == ACR_IDE and tokens[index+1][2] == '['):
+      (index_token, lexeme) = validate_matrix(index_token)
+      index_token += 1
     return (index_token, lexeme)
 
 def validate_grammar_assigning_value_variable(index_token):
@@ -982,14 +985,6 @@ def validate_grammar_arithmetic_expression(index_token):
       else:
         index_token += 1
 
-  # # controle de parenteses na expressão
-  # while(index_token < len(tokens) and len(parentheses) > 0):
-  #   if(tokens[index_token][2] == ')'):
-  #     index_token += 1
-  #     acc += ')'
-  #     parentheses.pop()
-  #   else:
-  #     print_if_missing_expecting(')')
   print_if_missing_expecting(parentheses)
   print_if_missing_expecting(expecting)
   
@@ -1071,15 +1066,6 @@ def validate_grammar_relational_expression(index_token):
         index_token += 1
       else:
         index_token += 1
-
-  # # controle de parenteses na expressão
-  # while(index_token < len(tokens) and len(parentheses) > 0):
-  #   if(tokens[index_token][2] == ')'):
-  #     index_token += 1
-  #     acc += ')'
-  #     parentheses.pop()
-  #   else:
-  #     print_if_missing_expecting(')')
 
   print_if_missing_expecting(parentheses)
   print_if_missing_expecting(expecting)
@@ -1199,7 +1185,7 @@ def validate_grammar_function_declaration(index_token):
       else:
         print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
         acc += red_painting(lexeme)
-    elif(next_expect == [lexeme, acronym]):
+    elif(next_expect in [lexeme, acronym]):
       expecting.pop()
       acc += lexeme
     elif(next_expect == '<type>'):
