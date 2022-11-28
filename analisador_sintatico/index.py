@@ -1217,7 +1217,7 @@ def run_sintatic():
 
   for (file_name, tokens) in all_lexical_tokens:
     while index_token < len_tokens:
-      [_, _, lexeme] = tokens[index_token]
+      [line, _, lexeme] = tokens[index_token]
 
       if (lexeme == 'struct'):
         (index_token, _) = validate_grammar_compound_declaration(index_token)
@@ -1234,6 +1234,8 @@ def run_sintatic():
       elif(lexeme == 'const' or lexeme == 'var'):
         (index_token, _) = validate_grammar_global_variable_declaration(index_token)
 
+      else:
+        unexpect_error_handler(lexeme, line)
       index_token += 1
 
 if __name__ == '__main__':
