@@ -21,6 +21,10 @@ def blue_painting(word):
     #painting a word in blue on terminal
     return '\033[1;34m' + str(word) + '\033[0;0m'
 
+def green_painting(word): 
+    #painting a word in blue on terminal
+    return '\033[1;32m' + str(word) + '\033[0;0m'
+
 def print_if_missing_expecting(expecting_stack):
     if(len(expecting_stack) > 0):
         expecting_stack.reverse()

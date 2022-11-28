@@ -1256,8 +1256,11 @@ def run_sintatic():
       else:
         unexpect_error_handler(lexeme, line)
       index_token += 1
-    salvar_analise_arquivo(file_name)
-    errors = []
+    if(errors):
+      salvar_analise_arquivo(file_name)
+      errors = []
+    else:
+      print(green_painting('Sucesso na execução do arquivo ' + file_name + ' !'))
 
 if __name__ == '__main__':
   run_sintatic()
