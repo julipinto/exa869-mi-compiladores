@@ -1,0 +1,13 @@
+01 PRE function
+01 PRE start
+01 DEL (
+01 DEL )
+01 DEL {
+02 IDE a
+02 REL =
+02 NRO 1
+03 IDE b
+03 REL =
+03 NRO 2
+05 DEL }
+

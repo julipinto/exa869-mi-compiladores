@@ -21,6 +21,7 @@ class AcronymsEnum(Enum):
 
 
 tokens = []
+all_lexical_tokens = []
 tokens_errors = []
 helper_operador_logico = ('&', '|')
 operadores_aritmeticos = ('+' , '-' , '*' , '/' , '++' , '--')
@@ -354,6 +355,8 @@ def print_console_header(path_name):
   print("**********************************************")
 
 def salvar_analise_arquivo(name_file, tokens):
+  f = name_file.replace('/', '\\').split('\\')[-1]
+  all_lexical_tokens.append((f, tokens))
   name_file = (os.path.splitext(name_file)[0]).replace('input', 'output')+'_saida.txt'
   arquivo = open(name_file, 'w+', encoding="utf-8")
   for token in tokens:
@@ -397,7 +400,7 @@ def run_lexical():
       if is_comment_block:
         tokens_errors.append((index_line, AcronymsEnum.UNFORMED_COMMENT.value , block_comment))
     salvar_analise_arquivo(relative_path_name, tokens)
-    return tokens
+  return all_lexical_tokens
 
 if __name__ == "__main__":
     run_lexical()

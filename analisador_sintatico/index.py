@@ -9,7 +9,9 @@ from analisador_lexico.index import AcronymsEnum, run_lexical
 
 from helper import *
 
-tokens = run_lexical()
+file_name = ''
+tokens = []
+all_lexical_tokens = run_lexical()
 
 
 ############################################### ACRONYMS CONSTANTS ###############################################
@@ -1209,28 +1211,30 @@ def validate_grammar_block(index_token):
 ############################################### MAIN ###############################################
 
 def run_sintatic():
+  global tokens, file_name
   index_token = 0
   len_tokens = len(tokens)
 
-  while index_token < len_tokens:
-    [_, _, lexeme] = tokens[index_token]
+  for (file_name, tokens) in all_lexical_tokens:
+    while index_token < len_tokens:
+      [_, _, lexeme] = tokens[index_token]
 
-    if (lexeme == 'struct'):
-      (index_token, _) = validate_grammar_compound_declaration(index_token)
+      if (lexeme == 'struct'):
+        (index_token, _) = validate_grammar_compound_declaration(index_token)
 
-    elif (lexeme == 'function'):
-      if(tokens[index_token+1][2] == 'start'):
-        (index_token, _) = validate_grammar_start_function(index_token)
-      else:
-        (index_token, _) = validate_grammar_function_declaration(index_token)
+      elif (lexeme == 'function'):
+        if(tokens[index_token+1][2] == 'start'):
+          (index_token, _) = validate_grammar_start_function(index_token)
+        else:
+          (index_token, _) = validate_grammar_function_declaration(index_token)
 
-    elif(lexeme == 'procedure'):
-      (index_token, _) = validate_grammar_procedure_declaration(index_token)
+      elif(lexeme == 'procedure'):
+        (index_token, _) = validate_grammar_procedure_declaration(index_token)
 
-    elif(lexeme == 'const' or lexeme == 'var'):
-      (index_token, _) = validate_grammar_global_variable_declaration(index_token)
+      elif(lexeme == 'const' or lexeme == 'var'):
+        (index_token, _) = validate_grammar_global_variable_declaration(index_token)
 
-    index_token += 1
+      index_token += 1
 
 if __name__ == '__main__':
   run_sintatic()
