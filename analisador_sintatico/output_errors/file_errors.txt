@@ -1,0 +1,4 @@
+1 Error: Unexpected token = on line 3
+2 Error: Unexpected token = on line 3
+3 Error: Unexpected token 2 on line 3
+4 Error: Unexpected token ; on line 57

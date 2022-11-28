@@ -11,7 +11,6 @@ from helper import *
 
 file_name = ''
 tokens = []
-errors = []
 all_lexical_tokens = run_lexical()
 
 
@@ -28,7 +27,7 @@ IDE_PRODUCTIONS = ['IDE', 'MATRIX', 'COMPOUND_TYPE']
 
 ############################################ UNEXPECT ERROR HANDLER ############################################
 def unexpect_error_handler(lexeme, line):
-  errors.append('Error: Unexpected token ' + red_painting(lexeme) + ' on line ' + str(line + 1))
+  errors.append('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
   print('Error: Unexpected token ' + red_painting(lexeme) + ' on line ' + str(line + 1))
   return red_painting(lexeme)
 
@@ -90,7 +89,7 @@ def validate_grammar_print(index_token):
         expecting.pop()
         acc += accum
       else:
-        errors.append('Error: Unexpected token ' + red_painting(lexeme) + ' on line ' + str(line + 1))
+        errors.append('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
         print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
         acc += red_painting(lexeme)
 
@@ -129,7 +128,7 @@ def validate_grammar_read(index_token):
         expecting.pop()
         acc += accum
       else:
-        errors.append('Error: Unexpected token ' + red_painting(lexeme) + ' on line ' + str(line + 1))
+        errors.append('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
         print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
         acc += red_painting(lexeme)
 
@@ -230,7 +229,7 @@ def validate_compound_type(index_token):
       continue    
 
     if(acronym1 != ACR_IDE):
-      errors.append('Error: Unexpected token ' + red_painting(lexeme1) + ' on line ' + str(line1 + 1))
+      errors.append('Error: Unexpected token ' + lexeme1 + ' on line ' + str(line1 + 1))
       print('Unexpected token ' + lexeme1 + ' at line ' + str(line1 + 1))
       index_token += 1
 
@@ -1219,23 +1218,23 @@ def validate_grammar_block(index_token):
 
 def salvar_analise_arquivo(name_file):
   sys.path.append(os.path.abspath('.'))
-  name_file = os.path.dirname(__file__) + str('\output_errors\/')+name_file+'_errors.txt'
+  name_file = os.path.dirname(__file__) + str('\output_errors\/')+(os.path.splitext(name_file)[0])+'_errors.txt'
   arquivo = open(name_file, 'w+', encoding="utf-8")
   for i, erro in enumerate(errors):
-    str_erro = i + " " + str(erro)
+    str_erro = str(i+1) + " " + str(erro)
     arquivo.write(str_erro+'\n')
   arquivo.close()
 
 ############################################### MAIN ###############################################
 
 def run_sintatic():
-  global tokens, file_name
+  global tokens, file_name, errors
   index_token = 0
-  len_tokens = len(tokens)
-
-  print(tokens)
+  errors = []
 
   for (file_name, tokens) in all_lexical_tokens:
+    len_tokens = len(tokens)
+
     while index_token < len_tokens:
       [line, _, lexeme] = tokens[index_token]
 
@@ -1254,10 +1253,12 @@ def run_sintatic():
       elif(lexeme == 'const' or lexeme == 'var'):
         (index_token, _) = validate_grammar_global_variable_declaration(index_token)
 
-      # else:
-      #   unexpect_error_handler(lexeme, line)
+      else:
+        unexpect_error_handler(lexeme, line)
       index_token += 1
+    print(errors)
     salvar_analise_arquivo(file_name)
+    errors = []
 
 if __name__ == '__main__':
   run_sintatic()
