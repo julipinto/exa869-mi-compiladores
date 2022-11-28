@@ -11,6 +11,7 @@ from helper import *
 
 file_name = ''
 tokens = []
+errors = []
 all_lexical_tokens = run_lexical()
 
 
@@ -1230,7 +1231,6 @@ def salvar_analise_arquivo(name_file):
 def run_sintatic():
   global tokens, file_name, errors
   index_token = 0
-  errors = []
 
   for (file_name, tokens) in all_lexical_tokens:
     len_tokens = len(tokens)
