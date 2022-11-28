@@ -400,7 +400,7 @@ def run_lexical():
       if is_comment_block:
         tokens_errors.append((index_line, AcronymsEnum.UNFORMED_COMMENT.value , block_comment))
     salvar_analise_arquivo(relative_path_name, tokens)
-    return all_lexical_tokens
+  return all_lexical_tokens
 
 if __name__ == "__main__":
     run_lexical()
