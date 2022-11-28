@@ -10,7 +10,7 @@ from analisador_lexico.index import AcronymsEnum, run_lexical
 from helper import *
 
 tokens = run_lexical()
- 
+
 
 ############################################### ACRONYMS CONSTANTS ###############################################
 ACR_CCA = AcronymsEnum.CHARACTER_CHAIN.value
@@ -64,54 +64,17 @@ def validate_arg(valid_args_list, index_token, function_arg = False, end_ide = '
 
     else:
       return index_token, unexpect_error_handler(next_lexeme, next_line)
-      #print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(next_line + 1))
-     # return index_token, lexeme
   else: 
     return index_token, unexpect_error_handler(next_lexeme, next_line)
-    # DA ERRO AQUI
-    #print('Error: Unexpected token ' + lexeme + ' on line ' + str(next_line + 1))
-    pass
-
-  return index_token, False
-
-def error(index_token, expecting, delimiters, next_expect, lexeme, line):
-  expecting.pop()
-  delimiters.pop()
-  has_delimiters = True
-  while(has_delimiters and (len(expecting) > 0 or len(delimiters) > 0 or index_token + 1 < len(expecting))):
-    if(delimiters[-1] != expecting[-1]):
-      expecting.pop()
-    else:
-      has_delimiters = False
-  if(tokens[index_token][2] == delimiters[-1] and tokens[index_token][2] == expecting[-1]):
-    index_token -= 1
-    print('Error: Expected token ' + red_painting(next_expect))
-  else:
-    print('Error: Unexpected token ' + red_painting(lexeme) + ' on line ' + str(line + 1))
-  return (index_token, expecting, delimiters)
-
-
-def error_args(index_token, expecting, delimiters, lexeme, line):
-  index_token -= 1
-  has_delimiters = True
-  while(has_delimiters and (len(expecting) > 0 or len(delimiters) > 0 or index_token + 1 < len(expecting))):
-    if(delimiters[-1] != expecting[-1]):
-      expecting.pop()
-    else:
-      has_delimiters = False
-  
-  print('Error: Unexpected token ' + red_painting(lexeme) + ' on line ' + str(line + 1))
-  return (index_token, expecting)
 
 
 ############################################### PRINT FUNCTIONS ###############################################
 
 def validate_grammar_print(index_token):
   expecting = create_stack(['print', '(', '<printable>', ')', ';'])
-  delimiters = create_stack(['(', ')', ';'])
   acc = ""
 
-  while index_token < len(tokens) and len(expecting) > 0 and len(delimiters) > 0:
+  while index_token < len(tokens) and len(expecting) > 0:
     [line, _, lexeme] = tokens[index_token]
     next_expect = expecting[-1]
 
@@ -123,40 +86,21 @@ def validate_grammar_print(index_token):
         expecting.pop()
         acc += accum
       else:
-        (index_token, expecting) = error_args(index_token, expecting, delimiters, lexeme, line)
-        # index_token -= 1
-        # has_delimiters = True
-        # while(has_delimiters and (len(expecting) > 0 or len(delimiters) > 0 or index_token + 1 < len(expecting))):
-        #   if(delimiters[-1] != expecting[-1]):
-        #     expecting.pop()
-        #   else:
-        #     has_delimiters = False
-        
-        # print('Error: Unexpected token ' + red_painting(lexeme) + ' on line ' + str(line + 1))
+        print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+        acc += red_painting(lexeme)
 
     elif(next_expect == lexeme):
-      if(delimiters[-1] == next_expect): delimiters.pop()
       expecting.pop()
       acc += lexeme
 
     else:
-      (index_token, expecting, delimiters) = error(index_token, expecting, delimiters, next_expect, lexeme, line)
-      # expecting.pop()
-      # delimiters.pop()
-      # has_delimiters = True
-      # while(has_delimiters and (len(expecting) > 0 or len(delimiters) > 0 or index_token + 1 < len(expecting))):
-      #   if(delimiters[-1] != expecting[-1]):
-      #     expecting.pop()
-      #   else:
-      #     has_delimiters = False
-      # if(tokens[index_token][2] == delimiters[-1] and tokens[index_token][2] == expecting[-1]):
-      #   index_token -= 1
-      #   print('Error: Expected token ' + red_painting(next_expect))
-      # else:
-      #   print('Error: Unexpected token ' + red_painting(lexeme) + ' on line ' + str(line + 1))
-
+      acc += red_painting(lexeme)
+      print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+    
     if(len(expecting) > 0):
       index_token += 1
+
+  print_if_missing_expecting(expecting)
   
   print(blue_painting(getframeinfo(currentframe()).lineno), acc)
   return index_token, acc
@@ -165,7 +109,6 @@ def validate_grammar_print(index_token):
 
 def validate_grammar_read(index_token):
   expecting = create_stack(['read', '(', '<readeble>', ')', ';'])
-  delimiters = create_stack(['(', ')', ';'])
   acc = ""
 
   while index_token < len(tokens) and len(expecting) > 0:
@@ -180,14 +123,16 @@ def validate_grammar_read(index_token):
         expecting.pop()
         acc += accum
       else:
-        (index_token, expecting) = error_args(index_token, expecting, delimiters, lexeme, line)
+        print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
+        acc += red_painting(lexeme)
 
     elif(next_expect == lexeme):
       expecting.pop()
       acc += lexeme
 
     else:
-      (index_token, expecting, delimiters) = error(index_token, expecting, delimiters, next_expect, lexeme, line)
+      acc += red_painting(lexeme)
+      print('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
     
     if(len(expecting) > 0):
       index_token += 1
@@ -197,7 +142,6 @@ def validate_grammar_read(index_token):
   
   print(blue_painting(getframeinfo(currentframe()).lineno), acc)
   return index_token, acc
-
 
 ############################################### MATRIX ###############################################
 
@@ -330,33 +274,35 @@ def validate_grammar_while(index_token):
 
 
 def validate_arg_if_while(index_token):
-  [_, acronym, lexeme] = tokens[index_token]
+  [line, acronym, lexeme] = tokens[index_token]
 
   if(index_token + 1 < len(tokens) and tokens[index_token+1][2] != ')'):
-    (index, production) = validate_arg_relational_expression(index_token, return_error = False)
+    (index, _) = validate_arg_relational_expression(index_token, return_error = False)
     
     if(index+1 < len(tokens) and tokens[index+1][1] == ACR_REL):
       return validate_grammar_relational_expression(index_token)
-      # index_token = index_valid + 1 #TODO: corrigir index que está sendo necessário acrescimo
     
-    # tenta identificar se o argumento antes do acronym é valido na expressão lógica
-    (index, production) = validate_arg_logical_expression(index_token, return_error = False)
+    (index, _) = validate_arg_logical_expression(index_token, return_error = False)
 
     if(index+1 < len(tokens) and tokens[index+1][1] == ACR_LOG):
       return validate_grammar_logical_expression(index_token)
+    
+    return index_token, unexpect_error_handler(lexeme, line)
 
   elif(is_boolean(lexeme) or acronym == ACR_IDE):
     return index_token+1, lexeme
 
+  else: 
+    return index_token, unexpect_error_handler(lexeme, line)
+
   
 ###############################################  ###############################################
-# TODO: else
 def validate_grammar_if(index_token):
   expecting = create_stack(['if', '(', '<exp>', ')', 'then', '<block>', '<optional_else>'])
   acc = ""
 
   while index_token < len(tokens) and len(expecting) > 0:
-    [line, acronym, lexeme] = tokens[index_token]
+    [line, _, lexeme] = tokens[index_token]
     next_expect = expecting[-1]
 
     if(next_expect == '<exp>'):
@@ -713,6 +659,7 @@ def validate_grammar_function_return(index_token):
   print(blue_painting(getframeinfo(currentframe()).lineno), acc)
   return index_token, acc
 
+
 def validate_arg_relational_expression(index_token, return_error = True):
   [_, acronym, lexeme] = tokens[index_token]
   has_parentheses = True
@@ -728,7 +675,7 @@ def validate_arg_relational_expression(index_token, return_error = True):
   if(acronym == ACR_CCA or acronym == ACR_NUM or acronym == is_boolean(lexeme)):
     return index_token, lexeme
 
-  if(acronym == ACR_IDE):
+  elif(acronym == ACR_IDE):
     [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
 
     if(next_acronym == ACR_REL): return index_token, lexeme
@@ -747,11 +694,10 @@ def validate_arg_relational_expression(index_token, return_error = True):
       unexpect_error_handler(next_lexeme, next_line)
     return index_token, lexeme
 
-  # validar <RetornoFuncao> | '(' <ExpressaoRelacional> ')' | '(' <Expressao> ')' | '(' <ExpressaoLogica> ')
 
 def validate_arg_logical_expression(index_token, return_error = True):
   # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
-  [_, acronym, lexeme] = tokens[index_token]
+  [line, acronym, lexeme] = tokens[index_token]
   has_parentheses = True
 
   if(not return_error):
@@ -766,20 +712,18 @@ def validate_arg_logical_expression(index_token, return_error = True):
     return index_token, lexeme
   else:
     if(index_token+1 < len(tokens)):
-
-      (index, production) = validate_arg_relational_expression(index_token, return_error = False)
-      # verifica se o acronym depois do argumento válido é um relacional
-      # isso identifica a expressão como relacional
-      
+      (index, _) = validate_arg_relational_expression(index_token, return_error = False)
       if(index+1 < len(tokens) and tokens[index+1][1] == ACR_REL):
         return validate_grammar_relational_expression(index_token)
-    # if(return_error):
-    #   print('Error: Unexpected token ' + next_lexeme + ' on line ' + str(next_line + 1))
     if(acronym == ACR_IDE):
       if(index_token+1 < len(tokens) and tokens[index_token+1][2] == '('):
         [index_token, lexeme] = validate_grammar_function_return(index_token)
       return index_token, lexeme
-    return index_token, lexeme
+  
+  if(return_error):
+    unexpect_error_handler(lexeme, line)
+  return index_token, lexeme
+
 
 def validate_arg_arithmetic_expression(valid_args_list, index_token, return_error = True):
   # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
@@ -788,18 +732,19 @@ def validate_arg_arithmetic_expression(valid_args_list, index_token, return_erro
 
   if(not return_error):
     while(has_parentheses):
-        if(lexeme == '('):
-          index_token += 1
-          [_, acronym, lexeme] = tokens[index_token]
-        else:
-          has_parentheses = False
+      if(lexeme == '('):
+        index_token += 1
+        [_, acronym, lexeme] = tokens[index_token]
+      else:
+        has_parentheses = False
 
   if(ACR_IDE in valid_args_list and acronym == ACR_IDE):
     return index_token, lexeme
 
   elif(ACR_NUM in valid_args_list and acronym == ACR_NUM):
     return index_token, lexeme
-  return index_token, lexeme
+  else:
+    return index_token, unexpect_error_handler(tokens[index_token][2], tokens[index_token][0])
 
 ########################################### LOGICAL EXPRESSIONS #############################################
 
@@ -817,23 +762,20 @@ def validate_grammar_logical_expression(index_token):
       acc += '!'
 
     if(index_token + 1 >= len(tokens)):
-      # print(expecting)
       finsh = True
 
     if(len(expecting) == 0 and not finsh):
-      [line, next_acronym, next_lexeme] = tokens[index_token + 1]
+      [line, _, next_lexeme] = tokens[index_token + 1]
       if(is_logical(next_lexeme)):
         expecting = create_stack(['<logical_value>'])
         acc += next_lexeme
         index_token += 1
       else:
         finsh = True
-        # continue
     else:
       print(lexeme)
       if(len(expecting) > 0):
         next_expect = expecting[-1]
-
         if(next_expect == '<logical_value>'):
           (index_token, accum) = validate_arg_logical_expression(index_token)
           if(accum != False):
@@ -841,11 +783,9 @@ def validate_grammar_logical_expression(index_token):
             acc += accum
           else:
             acc += unexpect_error_handler(lexeme, line)
-
         elif(next_expect in [acronym, lexeme] and is_logical(lexeme)):
           expecting.pop()
           acc += lexeme
-
         else:
           acc += unexpect_error_handler(lexeme, line)
 
@@ -1013,7 +953,7 @@ def validate_grammar_relational_expression(index_token):
 
 def validate_arg_function_content(index_token):
   # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
-  [_, acronym, lexeme] = tokens[index_token]
+  [line, acronym, lexeme] = tokens[index_token]
 
   if(lexeme == 'print'): 
     return validate_grammar_print(index_token)
@@ -1028,13 +968,17 @@ def validate_arg_function_content(index_token):
     return validate_grammar_if(index_token)
 
   elif (acronym == ACR_IDE): 
-    [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
+    [next_line, _, next_lexeme] = tokens[index_token + 1]
     if(next_lexeme == '('):
       (index_token, production) = validate_grammar_function_return(index_token)
       index_token += 1
       if(tokens[index_token][2] == ';'):
         production += ';'
         return (index_token, production)
+      return index_token, unexpect_error_handler(tokens[index_token][2], tokens[index_token][0])
+    return index_token, unexpect_error_handler(next_lexeme, next_line)
+  else:
+    return index_token, unexpect_error_handler(lexeme, line)
 
 
 def validate_arg_function_return(index_token):
@@ -1091,13 +1035,11 @@ def validate_grammar_function_declaration(index_token):
           expecting.pop()
         else:
           acc += unexpect_error_handler(lexeme, line)
-        # index_token -= 1
-        # expecting.pop()
       else:
         expecting.pop()
         continue
     elif(next_expect == '<conteudo>'):
-      (index_token, accum) = validate_content(index_token, validate_arg_function_content, 'return')
+      (index_token, accum) = validate_content(index_token, validate_arg_block_start_content, 'return')
       if(accum != False):
         acc += accum
         expecting.pop()
@@ -1137,7 +1079,7 @@ def validate_grammar_start_function(index_token):
   acc = ""
 
   while index_token < len(tokens) and len(expecting) > 0:
-    [line, acronym, lexeme] = tokens[index_token]
+    [line, _, lexeme] = tokens[index_token]
     next_expect = expecting[-1]
 
     if(next_expect == '<content>'):
@@ -1165,14 +1107,13 @@ def validate_grammar_start_function(index_token):
 
 def validate_arg_block_start_content(index_token):
   # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
-  [_, acronym, lexeme] = tokens[index_token]
+  [line, acronym, lexeme] = tokens[index_token]
 
   if(lexeme == 'print'): 
     return validate_grammar_print(index_token)
 
   elif (lexeme == 'read'):
-    (index_token, production) = validate_grammar_read(index_token)
-    return (index_token, production)
+    return validate_grammar_read(index_token)
 
   elif (lexeme == 'while'):
     return validate_grammar_while(index_token)
@@ -1183,12 +1124,14 @@ def validate_arg_block_start_content(index_token):
   elif(lexeme == 'var'):
     (index_token, production) = validate_grammar_global_variable_declaration(index_token)
     index_token += 1
-    if(tokens[index_token][2] == ';'):
+    [line, _, lexeme] = tokens[index_token]
+    if(lexeme == ';'):
       production += ';'
       return (index_token, production)
+    return index_token, unexpect_error_handler(lexeme, line)
 
   elif (index_token + 1 < len(tokens) and acronym == ACR_IDE): 
-    [_, _, next_lexeme] = tokens[index_token + 1]
+    [next_line, _, next_lexeme] = tokens[index_token + 1]
     if(next_lexeme == '='):
       (index_token, production) = validate_grammar_assigning_value_variable(index_token)
       index_token += 1
@@ -1206,13 +1149,17 @@ def validate_arg_block_start_content(index_token):
       if(tokens[index_token][2] == ';'):
         production += ';'
         return (index_token, production)
+    else:
+      return index_token, unexpect_error_handler(next_lexeme, next_line)
+    return index_token, unexpect_error_handler(tokens[index_token + 1][2], tokens[index_token + 1][0])
+  else:
+    return index_token, unexpect_error_handler(lexeme, line)
 
 def validate_content(index_token, validate_function, delimiter):
   [line, _, lexeme] = tokens[index_token]
   more_content = True
   acc = ""
   while(more_content):
-    
     (index_token, accum) = validate_function(index_token)
     if(accum != False):
       acc += accum

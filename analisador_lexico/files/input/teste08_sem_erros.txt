@@ -91,10 +91,11 @@ var {
 	//s = w[2];
 }*/
 
-function start(){
+function boolean funcao(){
 	while (b){
 		print (p);
-		read (oi));
+		}
+		read (oi);
 		teste(oi,ola,t(2,i,outra_funcao()));
 		outra_funcao();
 
@@ -120,7 +121,9 @@ function start(){
 		p = 5;
 
 		l = (2+(3*4)/(p));
-	}
+	
+
+	return 8;
 }
 
 /*var { string d= 3, d=4;
