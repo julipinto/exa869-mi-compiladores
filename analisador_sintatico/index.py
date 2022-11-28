@@ -1256,7 +1256,6 @@ def run_sintatic():
       else:
         unexpect_error_handler(lexeme, line)
       index_token += 1
-    print(errors)
     salvar_analise_arquivo(file_name)
     errors = []
 
