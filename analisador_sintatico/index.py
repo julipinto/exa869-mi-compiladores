@@ -379,7 +379,7 @@ def validate_variable_assignment(index_token):
       index_token -= 1
       return (index_token, accum)
 
-  if(acronym == ACR_IDE or acronym == ACR_NUM or is_boolean(lexeme)):
+  if(acronym == ACR_IDE or acronym == ACR_NUM or is_boolean(lexeme) or acronym == ACR_CCA):
     if(acronym == ACR_IDE and tokens[index+1][2] == '['):
       (index_token, lexeme) = validate_matrix(index_token)
       index_token += 1
@@ -566,6 +566,7 @@ def validate_grammar_global_variable_declaration(index_token):
 
 ####################################### PROCEDURE DECLARATION  ###############################################
 def validate_grammar_procedure_declaration(index_token):
+  print(tokens[index_token+1])
   expecting = create_stack(['procedure', 'IDE', '(', '<list_params>', ')', '<block>'])
   acc = ""
 
@@ -1085,7 +1086,7 @@ def validate_grammar_function_declaration(index_token):
 ############################################### START FUNCTION ###############################################
 
 def validate_grammar_start_function(index_token):
-  expecting = create_stack(['function', 'start', '(', ')', '{', '<content>', '}'])
+  expecting = create_stack(['<type_func>', 'start', '(', ')', '{', '<content>', '}'])
   acc = ""
 
   while index_token < len(tokens) and len(expecting) > 0:
@@ -1093,12 +1094,19 @@ def validate_grammar_start_function(index_token):
     next_expect = expecting[-1]
 
     if(next_expect == '<content>'):
-      (index_token, accum) = validate_content(index_token, validate_arg_block_start_content, '}')
-      if(accum != False):
-        acc += accum
-        expecting.pop()
+      if(lexeme != '}'):
+        (index_token, accum) = validate_content(index_token, validate_arg_block_start_content, '}')
+        if(accum != False):
+          acc += accum
+          expecting.pop()
+        else:
+          acc += unexpect_error_handler(lexeme, line)
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        expecting.pop()
+        continue
+    elif(next_expect == '<type_func>' and lexeme in ['function', 'procedure']):
+      expecting.pop()
+      acc += lexeme
     elif(next_expect == lexeme):
       expecting.pop()
       acc += lexeme
@@ -1241,14 +1249,13 @@ def run_sintatic():
       if (lexeme == 'struct'):
         (index_token, _) = validate_grammar_compound_declaration(index_token)
 
-      elif (lexeme == 'function'):
+      elif (lexeme == 'function' or lexeme == 'procedure'):
         if(tokens[index_token+1][2] == 'start'):
           (index_token, _) = validate_grammar_start_function(index_token)
+        elif(lexeme == 'procedure'):
+          (index_token, _) = validate_grammar_procedure_declaration(index_token)
         else:
           (index_token, _) = validate_grammar_function_declaration(index_token)
-
-      elif(lexeme == 'procedure'):
-        (index_token, _) = validate_grammar_procedure_declaration(index_token)
 
       elif(lexeme == 'const' or lexeme == 'var'):
         (index_token, _) = validate_grammar_global_variable_declaration(index_token)
