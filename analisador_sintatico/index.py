@@ -382,7 +382,6 @@ def validate_variable_assignment(index_token):
   if(acronym == ACR_IDE or acronym == ACR_NUM or is_boolean(lexeme) or acronym == ACR_CCA):
     if(acronym == ACR_IDE and tokens[index+1][2] == '['):
       (index_token, lexeme) = validate_matrix(index_token)
-      index_token += 1
     elif(acronym == ACR_IDE and tokens[index+1][2] == '('):
       (index_token, lexeme) = validate_grammar_function_return(index_token)
       # index_token += 1
