@@ -186,7 +186,7 @@ def validate_matrix(index_token):
       else:
         acc += unexpect_error_handler(next_lexeme, line, reference=getframeinfo(currentframe()).lineno)
     
-    if(len(expecting) > 0):
+    if(finsh == False):
       index_token += 1
 
   print_if_missing_expecting(expecting)
