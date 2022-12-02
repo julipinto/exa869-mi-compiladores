@@ -385,7 +385,7 @@ def validate_variable_assignment(index_token):
       index_token += 1
     elif(acronym == ACR_IDE and tokens[index+1][2] == '('):
       (index_token, lexeme) = validate_grammar_function_return(index_token)
-      index_token += 1
+      # index_token += 1
     return (index_token, lexeme)
 
 def validate_grammar_assigning_value_variable(index_token):
@@ -1178,7 +1178,6 @@ def validate_content(index_token, validate_function, delimiter):
   acc = ""
   while(more_content):
     (index_token, accum) = validate_function(index_token)
-    print(tokens[index_token])
     if(accum != False):
       acc += accum
     else:
