@@ -29,11 +29,5 @@
 07 DEL (
 07 DEL )
 07 DEL {
-07 PRE while
-07 DEL (
-07 IDE b
-07 DEL )
-07 DEL {
-07 DEL }
 07 DEL }
 
