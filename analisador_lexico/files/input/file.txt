@@ -1,5 +1,0 @@
-/*function start() {
-  a = 1
-  b = 2
-  // oi oi oi 
-}*/
