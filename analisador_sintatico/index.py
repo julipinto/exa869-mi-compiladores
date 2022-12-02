@@ -700,8 +700,8 @@ def validate_arg_relational_expression(index_token, return_error = True):
     elif(next_lexeme == '['): return validate_matrix(index_token)
 
     else:
-      if(return_error):
-        unexpect_error_handler(next_lexeme, next_line, reference=getframeinfo(currentframe()).lineno)
+      # if(return_error):
+      #   return index_token, unexpect_error_handler(next_lexeme, next_line, reference=getframeinfo(currentframe()).lineno)
       return index_token, lexeme
 
   else:
@@ -934,7 +934,6 @@ def validate_grammar_relational_expression(index_token):
 
       if(next_expect == '<value>'):
         (index_token, accum) = validate_arg_relational_expression(index_token)
-        
         if(accum != False):
           expecting.pop()
           acc += accum
@@ -959,6 +958,7 @@ def validate_grammar_relational_expression(index_token):
       else:
         index_token += 1
 
+  print(tokens[index_token])
   print_if_missing_expecting(parentheses)
   print_if_missing_expecting(expecting)
   
