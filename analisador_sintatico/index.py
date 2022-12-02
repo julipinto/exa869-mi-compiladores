@@ -456,7 +456,7 @@ def validate_grammar_variable_declaration(index_token):
 # TODO: Validar o <all_vars>
 
 def validate_grammar_compound_declaration(index_token):
-  expecting = create_stack(['struct', 'IDE', '{', '<all_vars>', '}', ';'])
+  expecting = create_stack(['struct', 'IDE', '{', '<all_vars>', '}'])
   acc = ""
 
   while index_token < len(tokens) and len(expecting) > 0:
@@ -494,7 +494,7 @@ def validate_grammar_compound_declaration(index_token):
 # TODO: Validar o <all_vars>
 
 def validate_grammar_extends(index_token):
-  expecting = create_stack(['IDE', 'extends', 'IDE', '{', '<all_vars>', '}', ';'])
+  expecting = create_stack(['IDE', 'extends', 'IDE', '{', '<all_vars>', '}'])
   acc = ""
 
   while index_token < len(tokens) and len(expecting) > 0:
@@ -1247,7 +1247,7 @@ def run_sintatic():
     len_tokens = len(tokens)
 
     while index_token < len_tokens:
-      [line, _, lexeme] = tokens[index_token]
+      [line, acronym, lexeme] = tokens[index_token]
 
       if (lexeme == 'struct'):
         (index_token, _) = validate_grammar_compound_declaration(index_token)
@@ -1262,6 +1262,9 @@ def run_sintatic():
 
       elif(lexeme == 'const' or lexeme == 'var'):
         (index_token, _) = validate_grammar_global_variable_declaration(index_token)
+
+      elif(acronym == ACR_IDE and tokens[index_token+1][2] == 'extends' and tokens[index_token+2][1] == ACR_IDE):
+        (index_token, _) = validate_grammar_extends(index_token)
 
       else:
         unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
