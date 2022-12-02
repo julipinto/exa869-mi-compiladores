@@ -1201,12 +1201,16 @@ def validate_grammar_block(index_token):
     next_expect = expecting[-1]
 
     if(next_expect == '<content>'):
-      (index_token, accum) = validate_content(index_token, validate_arg_block_start_content, '}')
-      if(accum != False):
-        acc += accum
-        expecting.pop()
+      if(lexeme != '}'):
+        (index_token, accum) = validate_content(index_token, validate_arg_block_start_content, '}')
+        if(accum != False):
+          acc += accum
+          expecting.pop()
+        else:
+          acc += unexpect_error_handler(lexeme, line)
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        expecting.pop()
+        continue
 
     elif(next_expect == lexeme):
       expecting.pop()
