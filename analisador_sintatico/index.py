@@ -27,9 +27,9 @@ IDE_PRODUCTIONS = ['IDE', 'MATRIX', 'COMPOUND_TYPE']
 
 
 ############################################ UNEXPECT ERROR HANDLER ############################################
-def unexpect_error_handler(lexeme, line):
+def unexpect_error_handler(lexeme, line, reference = None):
   errors.append('Error: Unexpected token ' + lexeme + ' on line ' + str(line + 1))
-  print('Error: Unexpected token ' + red_painting(lexeme) + ' on line ' + str(line + 1))
+  print(red_painting(reference) + ' Error: Unexpected token ' + red_painting(lexeme) + ' on line ' + str(line + 1))
   return red_painting(lexeme)
 
 ############################################### ARG VALIDATION ###############################################
@@ -67,9 +67,9 @@ def validate_arg(valid_args_list, index_token, function_arg = False, end_ide = '
     elif('MATRIX' in valid_args_list and next_lexeme == '['): return validate_matrix(index_token)
 
     else:
-      return index_token, unexpect_error_handler(next_lexeme, next_line)
+      return index_token, unexpect_error_handler(next_lexeme, next_line, reference=getframeinfo(currentframe()).lineno)
   else: 
-    return index_token, unexpect_error_handler(next_lexeme, next_line)
+    return index_token, unexpect_error_handler(next_lexeme, next_line, reference=getframeinfo(currentframe()).lineno)
 
 
 ############################################### PRINT FUNCTIONS ###############################################
@@ -179,12 +179,12 @@ def validate_matrix(index_token):
           expecting.pop()
           acc += next_lexeme
         else:
-          acc += unexpect_error_handler(next_lexeme, line)
+          acc += unexpect_error_handler(next_lexeme, line, reference=getframeinfo(currentframe()).lineno)
       elif(next_lexeme == next_expect):
         expecting.pop()
         acc += next_lexeme
       else:
-        acc += unexpect_error_handler(next_lexeme, line)
+        acc += unexpect_error_handler(next_lexeme, line, reference=getframeinfo(currentframe()).lineno)
     
     if(len(expecting) > 0):
       index_token += 1
@@ -258,7 +258,7 @@ def validate_grammar_while(index_token):
         acc += accum
         expecting.pop()
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
     elif(next_expect == '<block>'):
       (index_token, accum) = validate_grammar_block(index_token)
@@ -266,14 +266,14 @@ def validate_grammar_while(index_token):
         acc += accum
         expecting.pop()
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
     elif(next_expect == lexeme):
       expecting.pop()
       acc += lexeme
 
     else:
-      acc += unexpect_error_handler(lexeme, line)
+      acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     
     if(len(expecting) > 0):
       index_token += 1
@@ -298,13 +298,13 @@ def validate_arg_if_while(index_token):
     if(index+1 < len(tokens) and tokens[index+1][1] == ACR_LOG):
       return validate_grammar_logical_expression(index_token)
     
-    return index_token, unexpect_error_handler(lexeme, line)
+    return index_token, unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
   elif(is_boolean(lexeme) or acronym == ACR_IDE):
     return index_token+1, lexeme
 
   else: 
-    return index_token, unexpect_error_handler(lexeme, line)
+    return index_token, unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
   
 ###############################################  ###############################################
@@ -323,7 +323,7 @@ def validate_grammar_if(index_token):
         acc += accum
         expecting.pop()
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
     elif(next_expect == '<block>'):
       (index_token, accum) = validate_grammar_block(index_token)
@@ -331,7 +331,7 @@ def validate_grammar_if(index_token):
         acc += accum
         expecting.pop()
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
       if(len(expecting) > 0 and expecting[-1] == '<optional_else>'):
         if(index_token+1 < len(tokens) and tokens[index_token+1][2] == 'else'):
@@ -343,7 +343,7 @@ def validate_grammar_if(index_token):
       acc += lexeme
 
     else:
-      acc += unexpect_error_handler(lexeme, line)
+      acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     
     if(len(expecting) > 0):
       index_token += 1
@@ -398,7 +398,7 @@ def validate_grammar_assigning_value_variable(index_token):
       if(accum != False):
         acc += accum
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
   return (index_token, acc)
 ############################################### VARIABLE DECLARATION ###############################################
 
@@ -433,12 +433,12 @@ def validate_grammar_variable_declaration(index_token):
         acc += accum
         expecting.pop()
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     elif(next_expect in [acronym, lexeme]):
       expecting.pop()
       acc += lexeme + ' '
     else:
-      acc += unexpect_error_handler(lexeme, line)
+      acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
     if(len(expecting) > 0):
       index_token += 1
@@ -468,14 +468,14 @@ def validate_grammar_compound_declaration(index_token):
         if(not (index_token + 1 < len(tokens) and is_type(tokens[index_token + 1][2]))):
           expecting.pop()
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
     elif(next_expect in [acronym, lexeme]):
       expecting.pop()
       acc += lexeme
 
     else:
-      acc += unexpect_error_handler(lexeme, line)
+      acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     
     if(len(expecting) > 0):
       index_token += 1
@@ -506,14 +506,14 @@ def validate_grammar_extends(index_token):
         if(not (index_token + 1 < len(tokens) and is_type(tokens[index_token + 1][2]))):
           expecting.pop()
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
     elif(next_expect in [acronym, lexeme]):
       expecting.pop()
       acc += lexeme
 
     else:
-      acc += unexpect_error_handler(lexeme, line)
+      acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     
     if(len(expecting) > 0):
       index_token += 1
@@ -546,14 +546,14 @@ def validate_grammar_global_variable_declaration(index_token):
         if(not (index_token + 1 < len(tokens) and is_type(tokens[index_token + 1][2]))):
           expecting.pop()
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
     elif(next_expect == lexeme):
       expecting.pop()
       acc += lexeme
 
     else:
-      acc += unexpect_error_handler(lexeme, line)
+      acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     
 
     if(len(expecting) > 0):
@@ -581,7 +581,7 @@ def validate_grammar_procedure_declaration(index_token):
           acc += accum
           expecting.pop()
         else:
-          acc += unexpect_error_handler(lexeme, line)
+          acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
       else:
         expecting.pop()
         continue
@@ -592,14 +592,14 @@ def validate_grammar_procedure_declaration(index_token):
         acc += accum
         expecting.pop()
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
     elif(next_expect in [acronym, lexeme]):
       expecting.pop()
       acc += lexeme
 
     else:
-      acc += unexpect_error_handler(lexeme, line)
+      acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
     if(len(expecting) > 0):
       index_token += 1
@@ -642,11 +642,11 @@ def validate_grammar_function_return(index_token):
               if(accum != False):
                 acc += accum
               else:
-                acc += unexpect_error_handler(lexeme, line)
+                acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
             elif(next_expect == lexeme):
               acc += lexeme
             else:
-              acc += unexpect_error_handler(lexeme, line)
+              acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
             index_token += 1
             params.pop()
@@ -661,7 +661,7 @@ def validate_grammar_function_return(index_token):
       acc += lexeme
 
     else:
-      acc += unexpect_error_handler(lexeme, line)
+      acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
     if(len(expecting) > 0):
       index_token += 1
@@ -698,12 +698,12 @@ def validate_arg_relational_expression(index_token, return_error = True):
 
     else:
       if(return_error):
-        unexpect_error_handler(next_lexeme, next_line)
+        unexpect_error_handler(next_lexeme, next_line, reference=getframeinfo(currentframe()).lineno)
       return index_token, lexeme
 
   else:
     if(return_error):
-      unexpect_error_handler(next_lexeme, next_line)
+      unexpect_error_handler(next_lexeme, next_line, reference=getframeinfo(currentframe()).lineno)
     return index_token, lexeme
 
 
@@ -733,7 +733,7 @@ def validate_arg_logical_expression(index_token, return_error = True):
       return index_token, lexeme
   
   if(return_error):
-    unexpect_error_handler(lexeme, line)
+    unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
   return index_token, lexeme
 
 
@@ -756,7 +756,7 @@ def validate_arg_arithmetic_expression(valid_args_list, index_token, return_erro
   elif(ACR_NUM in valid_args_list and acronym == ACR_NUM):
     return index_token, lexeme
   else:
-    return index_token, unexpect_error_handler(tokens[index_token][2], tokens[index_token][0])
+    return index_token, unexpect_error_handler(tokens[index_token][2], tokens[index_token][0], reference=getframeinfo(currentframe()).lineno)
 
 ########################################### LOGICAL EXPRESSIONS #############################################
 
@@ -794,12 +794,12 @@ def validate_grammar_logical_expression(index_token):
             expecting.pop()
             acc += accum
           else:
-            acc += unexpect_error_handler(lexeme, line)
+            acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
         elif(next_expect in [acronym, lexeme] and is_logical(lexeme)):
           expecting.pop()
           acc += lexeme
         else:
-          acc += unexpect_error_handler(lexeme, line)
+          acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
     if(len(expecting) > 0):
       index_token += 1
@@ -859,7 +859,7 @@ def validate_grammar_arithmetic_expression(index_token):
           expecting.pop()
           acc += accum
         else:
-          acc += unexpect_error_handler(lexeme, line)
+          acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
       elif(next_expect == acronym and is_sum_or_sub_or_mult_or_div(lexeme)):
         expecting.pop()
@@ -871,7 +871,7 @@ def validate_grammar_arithmetic_expression(index_token):
         index_token += 1
 
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
       if(len(expecting) > 0):
         has_parentheses = True
@@ -934,7 +934,7 @@ def validate_grammar_relational_expression(index_token):
           expecting.pop()
           acc += accum
         else:
-          acc += unexpect_error_handler(lexeme, line)
+          acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
       elif(next_expect in [acronym, lexeme]):
         expecting.pop()
@@ -946,7 +946,7 @@ def validate_grammar_relational_expression(index_token):
         index_token += 1
 
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
       if(len(expecting) > 0):
         has_parentheses = True
@@ -986,10 +986,10 @@ def validate_arg_function_content(index_token):
       if(tokens[index_token][2] == ';'):
         production += ';'
         return (index_token, production)
-      return index_token, unexpect_error_handler(tokens[index_token][2], tokens[index_token][0])
-    return index_token, unexpect_error_handler(next_lexeme, next_line)
+      return index_token, unexpect_error_handler(tokens[index_token][2], tokens[index_token][0], reference=getframeinfo(currentframe()).lineno)
+    return index_token, unexpect_error_handler(next_lexeme, next_line, reference=getframeinfo(currentframe()).lineno)
   else:
-    return index_token, unexpect_error_handler(lexeme, line)
+    return index_token, unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
 
 def validate_arg_function_return(index_token):
@@ -1022,7 +1022,7 @@ def validate_parameters(index_token):
       elif(next_expect in [lexeme, acronym]):
         acc += lexeme
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
       index_token += 1
       params.pop()
   index_token -= 1
@@ -1045,7 +1045,7 @@ def validate_grammar_function_declaration(index_token):
           acc += accum
           expecting.pop()
         else:
-          acc += unexpect_error_handler(lexeme, line)
+          acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
       else:
         expecting.pop()
         continue
@@ -1055,14 +1055,14 @@ def validate_grammar_function_declaration(index_token):
         acc += accum
         expecting.pop()
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     elif(next_expect == '<return>'):
       (index_token, accum) = validate_arg_function_return(index_token)
       if(accum != False):
         expecting.pop()
         acc += accum
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     elif(next_expect in [lexeme, acronym]):
       expecting.pop()
       acc += lexeme
@@ -1071,9 +1071,9 @@ def validate_grammar_function_declaration(index_token):
         expecting.pop()
         acc += lexeme
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     else:
-      acc += unexpect_error_handler(lexeme, line)
+      acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     
     if(len(expecting) > 0):
       index_token += 1
@@ -1100,7 +1100,7 @@ def validate_grammar_start_function(index_token):
           acc += accum
           expecting.pop()
         else:
-          acc += unexpect_error_handler(lexeme, line)
+          acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
       else:
         expecting.pop()
         continue
@@ -1111,7 +1111,7 @@ def validate_grammar_start_function(index_token):
       expecting.pop()
       acc += lexeme
     else:
-      acc += unexpect_error_handler(lexeme, line)
+      acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     
     if(len(expecting) > 0):
       index_token += 1
@@ -1146,7 +1146,7 @@ def validate_arg_block_start_content(index_token):
     if(lexeme == ';'):
       production += ';'
       return (index_token, production)
-    return index_token, unexpect_error_handler(lexeme, line)
+    return index_token, unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
   elif (index_token + 1 < len(tokens) and acronym == ACR_IDE): 
     [next_line, _, next_lexeme] = tokens[index_token + 1]
@@ -1168,10 +1168,10 @@ def validate_arg_block_start_content(index_token):
         production += ';'
         return (index_token, production)
     else:
-      return index_token, unexpect_error_handler(next_lexeme, next_line)
-    return index_token, unexpect_error_handler(tokens[index_token + 1][2], tokens[index_token + 1][0])
+      return index_token, unexpect_error_handler(next_lexeme, next_line, reference=getframeinfo(currentframe()).lineno)
+    return index_token, unexpect_error_handler(tokens[index_token + 1][2], tokens[index_token + 1][0], reference=getframeinfo(currentframe()).lineno)
   else:
-    return index_token, unexpect_error_handler(lexeme, line)
+    return index_token, unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
 def validate_content(index_token, validate_function, delimiter):
   [line, _, lexeme] = tokens[index_token]
@@ -1182,7 +1182,7 @@ def validate_content(index_token, validate_function, delimiter):
     if(accum != False):
       acc += accum
     else:
-      acc += unexpect_error_handler(lexeme, line)
+      acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     if(tokens[index_token+1][2] == delimiter):
       more_content = False
     else:
@@ -1206,14 +1206,14 @@ def validate_grammar_block(index_token):
         acc += accum
         expecting.pop()
       else:
-        acc += unexpect_error_handler(lexeme, line)
+        acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
     elif(next_expect == lexeme):
       expecting.pop()
       acc += lexeme
 
     else:
-      acc += unexpect_error_handler(lexeme, line)
+      acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     
     if(len(expecting) > 0):
       index_token += 1
@@ -1261,7 +1261,7 @@ def run_sintatic():
         (index_token, _) = validate_grammar_global_variable_declaration(index_token)
 
       else:
-        unexpect_error_handler(lexeme, line)
+        unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
       index_token += 1
     if(errors):
       salvar_analise_arquivo(file_name)
