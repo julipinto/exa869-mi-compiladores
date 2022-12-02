@@ -1,7 +1,13 @@
-/*const { 
+/*const {
+	int MAX = 10;
+}
+
+var { 
 	int count1 = 0, count2 = a+b*c;
 	real juros = 13.5;
 	string msg = "oi";
+	int vetor;
+	real matriz;
 }
 
 procedure start ( ) { }*/

@@ -383,6 +383,9 @@ def validate_variable_assignment(index_token):
     if(acronym == ACR_IDE and tokens[index+1][2] == '['):
       (index_token, lexeme) = validate_matrix(index_token)
       index_token += 1
+    elif(acronym == ACR_IDE and tokens[index+1][2] == '('):
+      (index_token, lexeme) = validate_grammar_function_return(index_token)
+      index_token += 1
     return (index_token, lexeme)
 
 def validate_grammar_assigning_value_variable(index_token):
@@ -756,7 +759,9 @@ def validate_arg_arithmetic_expression(valid_args_list, index_token, return_erro
   elif(ACR_NUM in valid_args_list and acronym == ACR_NUM):
     return index_token, lexeme
   else:
-    return index_token, unexpect_error_handler(tokens[index_token][2], tokens[index_token][0], reference=getframeinfo(currentframe()).lineno)
+    if(return_error):
+      return index_token, unexpect_error_handler(tokens[index_token][2], tokens[index_token][0], reference=getframeinfo(currentframe()).lineno)
+    return index_token, lexeme
 
 ########################################### LOGICAL EXPRESSIONS #############################################
 
@@ -1140,13 +1145,7 @@ def validate_arg_block_start_content(index_token):
     return validate_grammar_if(index_token)
 
   elif(lexeme == 'var'):
-    (index_token, production) = validate_grammar_global_variable_declaration(index_token)
-    index_token += 1
-    [line, _, lexeme] = tokens[index_token]
-    if(lexeme == ';'):
-      production += ';'
-      return (index_token, production)
-    return index_token, unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
+    return validate_grammar_global_variable_declaration(index_token)
 
   elif (index_token + 1 < len(tokens) and acronym == ACR_IDE): 
     [next_line, _, next_lexeme] = tokens[index_token + 1]
@@ -1169,7 +1168,7 @@ def validate_arg_block_start_content(index_token):
         return (index_token, production)
     else:
       return index_token, unexpect_error_handler(next_lexeme, next_line, reference=getframeinfo(currentframe()).lineno)
-    return index_token, unexpect_error_handler(tokens[index_token + 1][2], tokens[index_token + 1][0], reference=getframeinfo(currentframe()).lineno)
+    # return index_token, unexpect_error_handler(tokens[index_token + 1][2], tokens[index_token + 1][0], reference=getframeinfo(currentframe()).lineno)
   else:
     return index_token, unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
@@ -1179,6 +1178,7 @@ def validate_content(index_token, validate_function, delimiter):
   acc = ""
   while(more_content):
     (index_token, accum) = validate_function(index_token)
+    print(tokens[index_token])
     if(accum != False):
       acc += accum
     else:

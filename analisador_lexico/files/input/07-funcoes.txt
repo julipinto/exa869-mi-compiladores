@@ -1,0 +1,23 @@
+const {
+	int MAX = 12, MAX2 = 40;
+}
+
+function int somar (int param1, int param2) {
+	var { 
+		real soma = 0;
+	}
+	soma = param1 + param2;
+	return soma;
+}
+
+procedure exibir (int valor) {
+	print(valor);
+}
+
+	
+procedure start ( ) {
+
+soma2 = somar(a,b);
+exibir (c);
+
+ }
