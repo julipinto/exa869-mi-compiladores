@@ -192,7 +192,6 @@ def validate_matrix(index_token):
   print_if_missing_expecting(expecting)
   
   print(blue_painting(getframeinfo(currentframe()).lineno), acc)
-
   return index_token, acc
 
 ############################################### COMPOUND TYPE ###############################################
@@ -382,15 +381,21 @@ def validate_variable_assignment(index_token):
   if(acronym == ACR_IDE or acronym == ACR_NUM or is_boolean(lexeme) or acronym == ACR_CCA):
     if(acronym == ACR_IDE and tokens[index+1][2] == '['):
       (index_token, lexeme) = validate_matrix(index_token)
+      # index_token += 1
+      # add
     elif(acronym == ACR_IDE and tokens[index+1][2] == '('):
       (index_token, lexeme) = validate_grammar_function_return(index_token)
       # index_token += 1
+    elif(acronym == ACR_IDE and tokens[index+1][2] == '.'): 
+      (index_token, lexeme) = validate_compound_type(index_token)
+    # add
     return (index_token, lexeme)
 
-def validate_grammar_assigning_value_variable(index_token):
+def validate_grammar_assigning_value_variable(index_token, acumular = True):
   acc = ''
   if(tokens[index_token][1] == ACR_IDE):
-    acc += tokens[index_token][2]
+    if(acumular):
+      acc += tokens[index_token][2]
     index_token += 1
     if(tokens[index_token][2] == '='):
       acc += '='
@@ -753,6 +758,10 @@ def validate_arg_arithmetic_expression(valid_args_list, index_token, return_erro
         has_parentheses = False
 
   if(ACR_IDE in valid_args_list and acronym == ACR_IDE):
+    if(acronym == ACR_IDE and tokens[index_token+1][2] == '.'): 
+      (index_token, lexeme) = validate_compound_type(index_token)
+    elif(acronym == ACR_IDE and tokens[index_token+1][2] == '['): 
+      (index_token, lexeme) = validate_matrix(index_token)
     return index_token, lexeme
 
   elif(ACR_NUM in valid_args_list and acronym == ACR_NUM):
@@ -1154,6 +1163,15 @@ def validate_arg_block_start_content(index_token):
       if(tokens[index_token][2] == ';'):
         production += ';'
         return (index_token, production)
+    elif(next_lexeme == '.'):
+      (index_token, production) = validate_compound_type(index_token)
+      if(tokens[index_token+1][2] == '='):
+        (index_token, new_production) = validate_grammar_assigning_value_variable(index_token, acumular = False)
+        index_token += 1
+        production += new_production
+        if(tokens[index_token][2] == ';'):
+          production += ';'
+          return (index_token, production)
     elif(next_lexeme == '('):
       (index_token, production) = validate_grammar_function_return(index_token)
       index_token += 1
