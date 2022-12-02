@@ -1,0 +1,25 @@
+1 Error: Unexpected token } on line 1
+2 Error: Unexpected token start on line 3
+3 Error: Unexpected token ( on line 3
+4 Error: Unexpected token ) on line 3
+5 Error: Unexpected token { on line 3
+6 Error: Unexpected token valor on line 5
+7 Error: Unexpected token = on line 5
+8 Error: Unexpected token calcula on line 5
+9 Error: Unexpected token ( on line 5
+10 Error: Unexpected token 13.5 on line 5
+11 Error: Unexpected token , on line 5
+12 Error: Unexpected token valor on line 5
+13 Error: Unexpected token ) on line 5
+14 Error: Unexpected token ; on line 5
+15 Error: Unexpected token imprimir on line 7
+16 Error: Unexpected token ( on line 7
+17 Error: Unexpected token "soma calculada" on line 7
+18 Error: Unexpected token ) on line 7
+19 Error: Unexpected token ; on line 7
+20 Error: Unexpected token imprimir on line 9
+21 Error: Unexpected token ( on line 9
+22 Error: Unexpected token texto on line 9
+23 Error: Unexpected token ) on line 9
+24 Error: Unexpected token ; on line 9
+25 Error: Unexpected token } on line 10

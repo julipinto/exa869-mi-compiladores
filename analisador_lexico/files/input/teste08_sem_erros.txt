@@ -50,11 +50,9 @@ procedure start {  // comeca aqui o programa principal
 	return 8;
 }*/
 
-/*var {
-	string l = (2+(3*4)/(p)),
-	s = w[2],
-	f = (d == 2 );
-};*/
+var {
+	string l = (2+(3*4)/(p)), s = w[2], f = (d == 2 );
+};
 
 /*while (b){
 	print (oi);

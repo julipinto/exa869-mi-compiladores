@@ -1,8 +1,6 @@
-1 Error: Unexpected token [1;31m][0;0m on line 6
-2 Error: Unexpected token [1;31m][0;0m on line 8
-3 Error: Unexpected token [1;31m[[0;0m on line 8
-4 Error: Unexpected token [1;31mk[0;0m on line 8
-5 Error: Unexpected token [1;31m][0;0m on line 8
-6 Error: Unexpected token [1;31m[[0;0m on line 12
-7 Error: Unexpected token [1;31mj[0;0m on line 12
-8 Error: Unexpected token [1;31m][0;0m on line 12
+1 Error: Unexpected token [1;31m[[0;0m on line 12
+2 Error: Unexpected token [1;31mj[0;0m on line 12
+3 Error: Unexpected token [1;31m][0;0m on line 12
+4 Error: Unexpected token [1;31m[[0;0m on line 11
+5 Error: Unexpected token [1;31mj[0;0m on line 11
+6 Error: Unexpected token [1;31m][0;0m on line 11
