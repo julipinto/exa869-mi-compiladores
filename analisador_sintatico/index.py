@@ -38,7 +38,7 @@ def unexpect_error_handler(lexeme, line, reference = None):
 # FUNÇÃO GENÉRICA QUE VALIDA ARGUMENTOS DE FUNÇÕES, EXEMPLO PRINT E READ
 def validate_arg(valid_args_list, index_token, function_arg = False, end_ide = ')'):
   # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
-  [_, acronym, lexeme] = tokens[index_token]
+  [line, acronym, lexeme] = tokens[index_token]
 
   if(ACR_CCA in valid_args_list and acronym == ACR_CCA):
     return index_token, lexeme
@@ -69,7 +69,7 @@ def validate_arg(valid_args_list, index_token, function_arg = False, end_ide = '
     else:
       return index_token, unexpect_error_handler(next_lexeme, next_line, reference=getframeinfo(currentframe()).lineno)
   else: 
-    return index_token, unexpect_error_handler(next_lexeme, next_line, reference=getframeinfo(currentframe()).lineno)
+    return index_token, unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
 
 
 ############################################### PRINT FUNCTIONS ###############################################
@@ -124,7 +124,7 @@ def validate_grammar_read(index_token):
     if(next_expect == '<readeble>'):
       valid_args = IDE_PRODUCTIONS
       (index_token, accum) = validate_arg(valid_args , index_token)
-
+      # print(tokens[index_token])
       if(accum != False):
         expecting.pop()
         acc += accum

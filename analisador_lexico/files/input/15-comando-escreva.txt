@@ -1,0 +1,12 @@
+procedure start ( ) { 
+     
+    print(variavel);
+    
+    print(vetor[i]);
+    
+    print(matriz[j][k]);
+    
+    print(aluno.disciplina);
+    
+    print(aluno.disciplina[j]);
+}

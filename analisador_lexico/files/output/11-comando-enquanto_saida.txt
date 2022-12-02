@@ -1,0 +1,15 @@
+03 PRE procedure
+03 PRE start
+03 DEL (
+03 DEL )
+03 DEL {
+05 PRE while
+05 DEL (
+05 IDE a
+05 REL >
+05 IDE b
+05 DEL )
+05 DEL {
+05 DEL }
+07 DEL }
+

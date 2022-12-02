@@ -1,0 +1,13 @@
+
+procedure start ( ) { 
+     
+    //read(var);
+    
+    read(vetor[i]);
+    
+    read(matriz[j][k]);
+    
+    read(aluno.disciplina);
+    
+    read(aluno.disciplina[j]);
+}
