@@ -12,6 +12,7 @@ from helper import *
 file_name = ''
 tokens = []
 errors = []
+type_tokens = []
 all_lexical_tokens = run_lexical()
 
 
@@ -25,6 +26,8 @@ ACR_ART = AcronymsEnum.ARITHMETIC_OPERATOR.value
 
 IDE_PRODUCTIONS = ['IDE', 'MATRIX', 'COMPOUND_TYPE']
 
+def add_type_token(lexeme, acronym, type, return_type = '-'):
+  type_tokens.append({'lexema': lexeme, 'acronym': acronym, 'type': type, 'return_type': return_type})
 
 ############################################ UNEXPECT ERROR HANDLER ############################################
 def unexpect_error_handler(lexeme, line, reference = None):
@@ -414,6 +417,7 @@ def validate_grammar_variable_declaration(index_token):
     print('Error: Type expected')
     return index_token, tokens[index_token][2]
 
+  type = tokens[index_token][2]
   acc = tokens[index_token][2] + ' '
 
   # May have more = , Ide <mayhavemore> | 
@@ -442,6 +446,8 @@ def validate_grammar_variable_declaration(index_token):
       else:
         acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     elif(next_expect in [acronym, lexeme]):
+      if(next_expect == acronym):
+        add_type_token(lexeme, acronym, type)
       expecting.pop()
       acc += lexeme + ' '
     else:
@@ -1046,6 +1052,7 @@ def validate_parameters(index_token):
 def validate_grammar_function_declaration(index_token):
   expecting = create_stack(['function', '<type>', 'IDE', '(', '<optional_params>', ')', '{', '<conteudo>', 'return', '<return>', ';', '}'])
   acc = ""
+  type = ''
 
   while index_token < len(tokens) and len(expecting) > 0:
     [line, acronym, lexeme] = tokens[index_token]
@@ -1077,10 +1084,13 @@ def validate_grammar_function_declaration(index_token):
       else:
         acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     elif(next_expect in [lexeme, acronym]):
+      if(next_expect == acronym):
+        add_type_token(lexeme, acronym, type, return_type = 'function')
       expecting.pop()
       acc += lexeme
     elif(next_expect == '<type>'):
       if(is_type(lexeme)):
+        type = lexeme
         expecting.pop()
         acc += lexeme
       else:
@@ -1291,6 +1301,7 @@ def run_sintatic():
       errors = []
     else:
       print(green_painting('Sucesso na execução do arquivo ' + file_name + ' !'))
+    print(type_tokens)
 
 if __name__ == '__main__':
   run_sintatic()

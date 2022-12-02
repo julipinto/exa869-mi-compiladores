@@ -42,19 +42,18 @@ procedure start {  // comeca aqui o programa principal
 //s+2/2/w
 
 //procedure proc (boolean b, int teste) {print(d); outra_funcao();}
-/*function boolean funcao(boolean b, int teste, real numero, string nome){
+function boolean chama_funcoes(boolean b, int teste, real numero, string nome){
 
 	outra_funcao();
 	t(2,i,outra());
 
 	return 8;
-}*/
+}
 
-/*var {
-	string l = (2+(3*4)/(p)),
-	s = w[2],
-	f = (d == 2 );
-};*/
+var {
+	string soma = (2+(3*4)/(p));
+	int f = (d == 2 );
+}
 
 /*while (b){
 	print (oi);
