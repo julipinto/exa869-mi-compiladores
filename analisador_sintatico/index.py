@@ -1,8 +1,9 @@
 import os
 import sys
 
-sys.path.append(os.path.abspath('../'))
+sys.path.append(os.path.abspath('../exa869-mi-compiladores'))
 
+# print(sys.path.append(os.path.abspath('../exa869-mi-compiladores')))
 from inspect import currentframe, getframeinfo
 
 from analisador_lexico.index import AcronymsEnum, run_lexical
@@ -26,8 +27,8 @@ ACR_ART = AcronymsEnum.ARITHMETIC_OPERATOR.value
 
 IDE_PRODUCTIONS = ['IDE', 'MATRIX', 'COMPOUND_TYPE']
 
-def add_type_token(lexeme, acronym, type, return_type = '-'):
-  type_tokens.append({'lexema': lexeme, 'acronym': acronym, 'type': type, 'return_type': return_type})
+def add_type_token(lexeme, acronym, type, return_type = '-', params_type = '-'):
+  type_tokens.append({'lexema': lexeme, 'acronym': acronym, 'type': type, 'return_type': return_type, 'params_type': params_type})
 
 ############################################ UNEXPECT ERROR HANDLER ############################################
 def unexpect_error_handler(lexeme, line, reference = None):
@@ -589,7 +590,7 @@ def validate_grammar_procedure_declaration(index_token):
 
     if(next_expect == '<list_params>'):
       if(lexeme != ')'):
-        (index_token, accum) = validate_parameters(index_token)
+        (index_token, accum) = validate_parameters(index_token, type_block = 'procedure')
         if(accum != False):
           acc += accum
           expecting.pop()
@@ -1019,9 +1020,10 @@ def validate_arg_function_return(index_token):
   return (index_token, lexeme)
 
 
-def validate_parameters(index_token):
+def validate_parameters(index_token, type_block = '-'):
   more_params = True
   acc = ""
+  type = ""
   params = create_stack(['<type>', 'IDE'])
   while more_params and index_token < len(tokens)-1 and tokens[index_token][2] != ')':
     [line, acronym, lexeme] = tokens[index_token]
@@ -1037,8 +1039,12 @@ def validate_parameters(index_token):
         if(not is_type(lexeme)):
           print('Error: Type expected')
         else:
+          type = lexeme
           acc += lexeme
       elif(next_expect in [lexeme, acronym]):
+        if(next_expect == acronym):
+          add_type_token(lexeme, acronym, type, params_type = type_block)
+          type = ""
         acc += lexeme
       else:
         acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
@@ -1060,7 +1066,7 @@ def validate_grammar_function_declaration(index_token):
 
     if(next_expect == '<optional_params>'):
       if(lexeme != ')'):
-        (index_token, accum) = validate_parameters(index_token)
+        (index_token, accum) = validate_parameters(index_token, type_block = 'function')
         if(accum != False):
           acc += accum
           expecting.pop()
