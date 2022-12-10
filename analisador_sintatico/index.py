@@ -30,7 +30,7 @@ IDE_PRODUCTIONS = ['IDE', 'MATRIX', 'COMPOUND_TYPE']
 type_tokens = []
 
 def add_type_token(lexeme, acronym, type, return_type = '-', params_type = '-'):
-  type_tokens.append({'lexema': lexeme, 'acronym': acronym, 'type': type, 'return_type': return_type, 'params_type': params_type})
+  type_tokens.append({'lexema': lexeme, 'estrutura lexica': acronym, 'type': type, 'return_type': return_type, 'params_type': params_type})
 
 def find_lexeme_in_table(lexeme):
   for token in type_tokens:

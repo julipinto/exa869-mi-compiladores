@@ -1,54 +1,58 @@
+129 PRE var
+129 DEL {
+130 PRE string
+130 IDE nome
+130 DEL ;
+131 PRE int
+131 IDE idade
+131 DEL ;
+132 DEL }
 134 PRE procedure
 134 PRE start
 134 DEL (
 134 DEL )
 134 DEL {
-135 PRE string
-135 IDE nome
-135 REL =
-135 CAC "Daniel"
+135 PRE print
+135 DEL (
+135 CAC "Digite o nome"
+135 DEL )
 135 DEL ;
-136 PRE print
+136 PRE read
 136 DEL (
-136 CAC "Digite o nome"
+136 IDE nome
 136 DEL )
 136 DEL ;
-137 PRE read
+137 PRE print
 137 DEL (
-137 IDE nome
+137 CAC "Digite a idade"
 137 DEL )
 137 DEL ;
-138 PRE print
+138 PRE read
 138 DEL (
-138 CAC "Digite a idade"
+138 IDE idade
 138 DEL )
 138 DEL ;
-139 PRE read
-139 DEL (
-139 IDE idade
-139 DEL )
-139 DEL ;
-141 PRE if
+140 PRE if
+140 DEL (
+140 IDE idade
+140 REL >=
+140 NRO 150
+140 DEL )
+140 PRE then
+140 DEL {
+141 PRE print
 141 DEL (
-141 IDE idade
-141 REL >=
-141 NRO 150
+141 CAC "pode aposentar kkkk"
 141 DEL )
-141 PRE then
-141 DEL {
-142 PRE print
-142 DEL (
-142 CAC "pode aposentar kkkk"
-142 DEL )
-142 DEL ;
-143 DEL }
-143 PRE else
-143 DEL {
-144 PRE print
-144 DEL (
-144 CAC "vai trabalhar"
-144 DEL )
-144 DEL ;
-145 DEL }
-147 DEL }
+141 DEL ;
+142 DEL }
+142 PRE else
+142 DEL {
+143 PRE print
+143 DEL (
+143 CAC "vai trabalhar"
+143 DEL )
+143 DEL ;
+144 DEL }
+146 DEL }
 
