@@ -13,7 +13,6 @@ from helper import *
 file_name = ''
 tokens = []
 errors = []
-type_tokens = []
 all_lexical_tokens = run_lexical()
 
 
@@ -27,8 +26,25 @@ ACR_ART = AcronymsEnum.ARITHMETIC_OPERATOR.value
 
 IDE_PRODUCTIONS = ['IDE', 'MATRIX', 'COMPOUND_TYPE']
 
+############################################### DECLARATION TABLE  ###############################################
+type_tokens = []
+
 def add_type_token(lexeme, acronym, type, return_type = '-', params_type = '-'):
   type_tokens.append({'lexema': lexeme, 'acronym': acronym, 'type': type, 'return_type': return_type, 'params_type': params_type})
+
+def find_lexeme_in_table(lexeme):
+  for token in type_tokens:
+    if(token['lexema'] == lexeme):
+      return token
+  return False
+
+def check_previous_declaration(index_token): 
+  [line, acronym, lexeme] = tokens[index_token]
+  table_lexeme = find_lexeme_in_table(lexeme)
+  if(table_lexeme == False):
+    errors.append('Error: Variable ' + lexeme + ' not declared on line ' + str(line + 1))
+    print(red_painting(getframeinfo(currentframe()).lineno) + ' Error: Variable ' + red_painting(lexeme) + ' not declared on line ' + str(line + 1))
+
 
 ############################################ UNEXPECT ERROR HANDLER ############################################
 def unexpect_error_handler(lexeme, line, reference = None):
@@ -40,7 +56,7 @@ def unexpect_error_handler(lexeme, line, reference = None):
 
 ## PODE SER QUE TENHA QUE MELHORAR ISSO AQUI
 # FUNÇÃO GENÉRICA QUE VALIDA ARGUMENTOS DE FUNÇÕES, EXEMPLO PRINT E READ
-def validate_arg(valid_args_list, index_token, function_arg = False, end_ide = ')'):
+def validate_arg(valid_args_list, index_token, function_arg = False, end_ide = ')', check_declaration=False):
   # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
   [line, acronym, lexeme] = tokens[index_token]
 
@@ -63,6 +79,9 @@ def validate_arg(valid_args_list, index_token, function_arg = False, end_ide = '
   # check if there is a production derivated from IDE
   if((set(IDE_PRODUCTIONS) & set(valid_args_list)) and acronym == ACR_IDE):
     [next_line, next_acronym, next_lexeme] = tokens[index_token + 1]
+
+    if(check_declaration):
+      check_previous_declaration(index_token)
 
     if('IDE' in valid_args_list and end_ide in [f"_{next_acronym}", next_lexeme]): return index_token, lexeme
 
@@ -89,7 +108,7 @@ def validate_grammar_print(index_token):
     if(next_expect == '<printable>'):
       valid_args = [ACR_CCA, ACR_NUM]
       valid_args.extend(IDE_PRODUCTIONS)
-      (index_token, accum) = validate_arg(valid_args, index_token)
+      (index_token, accum) = validate_arg(valid_args, index_token, check_declaration=True)
       if(accum != False):
         expecting.pop()
         acc += accum
@@ -127,8 +146,7 @@ def validate_grammar_read(index_token):
 
     if(next_expect == '<readeble>'):
       valid_args = IDE_PRODUCTIONS
-      (index_token, accum) = validate_arg(valid_args , index_token)
-      # print(tokens[index_token])
+      (index_token, accum) = validate_arg(valid_args , index_token, check_declaration=True)
       if(accum != False):
         expecting.pop()
         acc += accum
@@ -580,7 +598,6 @@ def validate_grammar_global_variable_declaration(index_token):
 
 ####################################### PROCEDURE DECLARATION  ###############################################
 def validate_grammar_procedure_declaration(index_token):
-  print(tokens[index_token+1])
   expecting = create_stack(['procedure', 'IDE', '(', '<list_params>', ')', '<block>'])
   acc = ""
 
@@ -652,7 +669,7 @@ def validate_grammar_function_return(index_token):
           else:
             next_expect = params[-1]
             if(next_expect == '<optional_params>'):
-              (index_token, accum) = validate_arg(valid_args, index_token, function_arg = True)
+              (index_token, accum) = validate_arg(valid_args, index_token, function_arg = True, check_declaration=True)
               if(accum != False):
                 acc += accum
               else:
@@ -973,7 +990,6 @@ def validate_grammar_relational_expression(index_token):
       else:
         index_token += 1
 
-  print(tokens[index_token])
   print_if_missing_expecting(parentheses)
   print_if_missing_expecting(expecting)
   
