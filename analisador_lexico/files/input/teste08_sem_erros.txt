@@ -128,7 +128,8 @@ var { string d= 3, d=4;
 
 var {
 	string nome;
-	int idade;
+	int idade, numero;
+	boolean teste;
 }
 
 function int nome_funcao() {
@@ -137,16 +138,20 @@ function int nome_funcao() {
 }
 
 procedure start() {
-	print("Digite o nome");
+	teste = false;
+	idade = nome_funcao();
+	/*print("Digite o nome");
 	read(nome);
 	print("Digite a idade");
 	read(idade);
+
+	invalida();
 	
 	if (idade >= 150) then {
 		print("pode aposentar kkkk");
 	} else {
 		print("vai trabalhar");
-	}	
+	}	*/
 
 }
  

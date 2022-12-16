@@ -13,6 +13,7 @@ from helper import *
 file_name = ''
 tokens = []
 errors = []
+errors_semantic = []
 all_lexical_tokens = run_lexical()
 
 
@@ -42,9 +43,50 @@ def check_previous_declaration(index_token):
   [line, acronym, lexeme] = tokens[index_token]
   table_lexeme = find_lexeme_in_table(lexeme)
   if(table_lexeme == False):
-    errors.append('Error: Variable ' + lexeme + ' not declared on line ' + str(line + 1))
-    print(red_painting(getframeinfo(currentframe()).lineno) + ' Error: Variable ' + red_painting(lexeme) + ' not declared on line ' + str(line + 1))
+    not_declared_error(lexeme, line)
 
+def find_declared_function(lexeme):
+  for token in type_tokens:
+    if(token['name_function'] == lexeme):
+      return token
+  return False
+
+def type_error(lexeme, line):
+  errors_semantic.append('Error: type error at ' + lexeme + ' ' +  str(line + 1))
+  print(red_painting(getframeinfo(currentframe()).lineno) + ' Error: type error at ' + red_painting(lexeme) + ' ' + str(line + 1))
+
+def not_declared_error(lexeme, line):
+  errors_semantic.append('Error: Variable ' + lexeme + ' not declared on line ' + str(line + 1))
+  print(red_painting(getframeinfo(currentframe()).lineno) + ' Error: Variable ' + red_painting(lexeme) + ' not declared on line ' + str(line + 1))
+
+def check_types(lexeme_var, lexeme, line, acronym):
+  info = find_lexeme_in_table(lexeme_var)
+  if(not info):
+    not_declared_error(lexeme, line)
+    return
+
+  lexeme_type = info['type']
+  if(not (
+    (lexeme_type == 'string' and acronym == 'CAC') or
+    (lexeme_type == 'int' and acronym == 'NRO') or 
+    (lexeme_type == 'boolean' and is_boolean(lexeme)) or 
+    (lexeme_type == 'real' and acronym == 'NRO')
+    )):
+    type_error(lexeme, line)
+
+
+def compare_types(lexeme_var, lexeme_value, line):
+  info_var = find_lexeme_in_table(lexeme_var)
+  if(info_var):
+    info_value = find_lexeme_in_table(lexeme_value)
+    info_value = info_value if info_value else find_declared_function(lexeme_value)
+    if(info_value):
+      if(info_var['type'] != info_value['type']):
+        type_error(lexeme_value, line)
+    else:
+      not_declared_error(lexeme_value, line)
+  else:
+    not_declared_error(lexeme_var, line)
 
 ############################################ UNEXPECT ERROR HANDLER ############################################
 def unexpect_error_handler(lexeme, line, reference = None):
@@ -375,8 +417,8 @@ def validate_grammar_if(index_token):
   print(blue_painting(getframeinfo(currentframe()).lineno), acc)
   return index_token, acc
 
-def validate_variable_assignment(index_token):
-  [_, acronym, lexeme] = tokens[index_token]
+def validate_variable_assignment(index_token, lexeme_var = None):
+  [line, acronym, lexeme] = tokens[index_token]
 
   if(index_token + 1 < len(tokens)):
 
@@ -406,24 +448,30 @@ def validate_variable_assignment(index_token):
       # index_token += 1
       # add
     elif(acronym == ACR_IDE and tokens[index+1][2] == '('):
+      compare_types(lexeme_var, lexeme, line)
       (index_token, lexeme) = validate_grammar_function_return(index_token)
       # index_token += 1
     elif(acronym == ACR_IDE and tokens[index+1][2] == '.'): 
       (index_token, lexeme) = validate_compound_type(index_token)
-    # add
+    else:
+      if(acronym == ACR_IDE):
+        compare_types(lexeme_var, lexeme, line)
+      else:
+        check_types(lexeme_var, lexeme, line, acronym)
     return (index_token, lexeme)
 
 def validate_grammar_assigning_value_variable(index_token, acumular = True):
   acc = ''
   if(tokens[index_token][1] == ACR_IDE):
     if(acumular):
+      lexeme_var = tokens[index_token][2]
       acc += tokens[index_token][2]
     index_token += 1
     if(tokens[index_token][2] == '='):
       acc += '='
       index_token += 1
       [line, _, lexeme] = tokens[index_token]
-      (index_token, accum) = validate_variable_assignment(index_token)
+      (index_token, accum) = validate_variable_assignment(index_token, lexeme_var)
       if(accum != False):
         acc += accum
       else:

@@ -1,29 +1,5 @@
-- agr ta permitindo printar inteiro
 
   ===================================================================
-- Produções Concluídas
-  read
-  print
-  matriz
-  acesso ao valor composto
-  struct
-  chamada de função
-  expressão lógica
-  expressão aritmética
-  procedimento
-  bloco
-  funcao principal start
-
-- Produções que precisam de correção/finalização ou serem testadas
-  variáveis globais
-    constantes
-    variaveis
-  extends
-  expressão relacional
-  declaração de função
-  declaração de variável
-  if --> Validar a expressão
-  while --> Validar a expressão
-
-  ## Revisar todos os erros numa saída mais comum
+  - verificar tipo dos parametros de funcoes ao chamar
+  - verificar tipo das expressoes
   ===================================================================
