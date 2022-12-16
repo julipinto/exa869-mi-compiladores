@@ -16,6 +16,11 @@
 135 PRE int
 135 IDE nome_funcao
 135 DEL (
+135 PRE int
+135 IDE p1
+135 DEL ,
+135 PRE string
+135 IDE p1
 135 DEL )
 135 DEL {
 136 PRE print
@@ -40,6 +45,9 @@
 142 REL =
 142 IDE nome_funcao
 142 DEL (
+142 IDE idade
+142 DEL ,
+142 IDE numero
 142 DEL )
 142 DEL ;
 156 DEL }

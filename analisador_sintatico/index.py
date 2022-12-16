@@ -30,8 +30,8 @@ IDE_PRODUCTIONS = ['IDE', 'MATRIX', 'COMPOUND_TYPE']
 ############################################### DECLARATION TABLE  ###############################################
 type_tokens = []
 
-def add_type_token(lexeme, acronym, type, name_function = '-', return_type = '-', params_type = '-'):
-  type_tokens.append({'lexema': lexeme, 'estrutura lexica': acronym, 'type': type, 'name_function': name_function, 'return_type': return_type, 'params_type': params_type})
+def add_type_token(lexeme, acronym, type, name_function = '-', return_type = '-', params_type = '-', params_types = '-'):
+  type_tokens.append({'lexema': lexeme, 'estrutura lexica': acronym, 'type': type, 'name_function': name_function, 'return_type': return_type, 'params_type': params_type, 'params_types': params_types})   
 
 def find_lexeme_in_table(lexeme):
   for token in type_tokens:
@@ -74,7 +74,6 @@ def check_types(lexeme_var, lexeme, line, acronym):
     )):
     type_error(lexeme, line)
 
-
 def compare_types(lexeme_var, lexeme_value, line):
   info_var = find_lexeme_in_table(lexeme_var)
   if(info_var):
@@ -87,6 +86,39 @@ def compare_types(lexeme_var, lexeme_value, line):
       not_declared_error(lexeme_value, line)
   else:
     not_declared_error(lexeme_var, line)
+
+def check_function_call(fn_name, params_list, line):
+  declared_func = find_declared_function(fn_name)
+  
+  if(not declared_func):
+    not_declared_error(fn_name, line)
+    return
+
+  required_types_list = declared_func['params_types']
+
+  if(len(params_list) != len(required_types_list)):
+    errors_semantic.append('Error: Invalid number of parameters at ' + fn_name + ' ' +  str(line + 1))
+    print(red_painting(getframeinfo(currentframe()).lineno) + ' Error: Invalid number of parameters at ' + red_painting(fn_name) + ' ' + str(line + 1))
+    return
+
+  for i in range(len(params_list)):
+    required_type = required_types_list[i]
+    
+    param = params_list[i]
+    type = ''
+    if(param['acronym'] == 'IDE'):
+      type = find_lexeme_in_table(param['lexeme'])['type']
+
+    if(not (
+      (required_type == type) or
+      (required_type == 'string' and param['acronym'] == 'CAC') or
+      (required_type == 'int' and param['acronym'] == 'NRO') or 
+      (required_type == 'boolean' and is_boolean(param['lexeme'])) or 
+      (required_type == 'real' and param['acronym'] == 'NRO')
+      )):
+      type_error(param['lexeme'], line)
+
+
 
 ############################################ UNEXPECT ERROR HANDLER ############################################
 def unexpect_error_handler(lexeme, line, reference = None):
@@ -694,6 +726,8 @@ def validate_grammar_procedure_declaration(index_token):
 def validate_grammar_function_return(index_token):
   expecting = create_stack(['IDE', '(', '<optional_params>', ')'])
   acc = ""
+  fn_name = ""
+  params_list = []
 
   while index_token < len(tokens) and len(expecting) > 0:
     [line, acronym, lexeme] = tokens[index_token]
@@ -717,7 +751,12 @@ def validate_grammar_function_return(index_token):
           else:
             next_expect = params[-1]
             if(next_expect == '<optional_params>'):
+              last = index_token
               (index_token, accum) = validate_arg(valid_args, index_token, function_arg = True, check_declaration=True)
+
+              if(not (index_token != last and acronym == ACR_IDE)):
+                params_list.append({'acronym': acronym, 'lexeme': lexeme})
+
               if(accum != False):
                 acc += accum
               else:
@@ -736,6 +775,9 @@ def validate_grammar_function_return(index_token):
         continue
 
     elif(next_expect in [acronym, lexeme]):
+      if(acronym == ACR_IDE):
+        fn_name = lexeme
+
       expecting.pop()
       acc += lexeme
 
@@ -745,6 +787,7 @@ def validate_grammar_function_return(index_token):
     if(len(expecting) > 0):
       index_token += 1
 
+  check_function_call(fn_name, params_list, line)
   print_if_missing_expecting(expecting)
   
   print(blue_painting(getframeinfo(currentframe()).lineno), acc)
@@ -870,7 +913,6 @@ def validate_grammar_logical_expression(index_token):
       else:
         finsh = True
     else:
-      print(lexeme)
       if(len(expecting) > 0):
         next_expect = expecting[-1]
         if(next_expect == '<logical_value>'):
@@ -1087,7 +1129,7 @@ def validate_arg_function_return(index_token):
 def validate_parameters(index_token, type_block = '-'):
   more_params = True
   acc = ""
-  type = ""
+  types = []
   params = create_stack(['<type>', 'IDE'])
   while more_params and index_token < len(tokens)-1 and tokens[index_token][2] != ')':
     [line, acronym, lexeme] = tokens[index_token]
@@ -1103,6 +1145,7 @@ def validate_parameters(index_token, type_block = '-'):
         if(not is_type(lexeme)):
           print('Error: Type expected')
         else:
+          types.append(lexeme)
           type = lexeme
           acc += lexeme
       elif(next_expect in [lexeme, acronym]):
@@ -1115,7 +1158,7 @@ def validate_parameters(index_token, type_block = '-'):
       index_token += 1
       params.pop()
   index_token -= 1
-  return (index_token, acc)
+  return (index_token, acc, types)
 
 ############################################### FUNCTIONS DECLARATION ###############################################
 
@@ -1123,14 +1166,17 @@ def validate_grammar_function_declaration(index_token):
   expecting = create_stack(['function', '<type>', 'IDE', '(', '<optional_params>', ')', '{', '<conteudo>', 'return', '<return>', ';', '}'])
   acc = ""
   type = ''
+  fn_info = {}
+  param_types = []
 
   while index_token < len(tokens) and len(expecting) > 0:
     [line, acronym, lexeme] = tokens[index_token]
     next_expect = expecting[-1]
 
+
     if(next_expect == '<optional_params>'):
       if(lexeme != ')'):
-        (index_token, accum) = validate_parameters(index_token, type_block = 'function')
+        (index_token, accum, param_types) = validate_parameters(index_token, type_block = 'function')
         if(accum != False):
           acc += accum
           expecting.pop()
@@ -1155,12 +1201,14 @@ def validate_grammar_function_declaration(index_token):
         acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     elif(next_expect in [lexeme, acronym]):
       if(next_expect == 'IDE'):
-        add_type_token(lexeme, acronym, type, name_function= lexeme, return_type = 'function')
+        fn_info['lexeme'] = lexeme
+        fn_info['acronym'] = acronym
+        # add_type_token(lexeme, acronym, type, name_function= lexeme, return_type = 'function')
       expecting.pop()
       acc += lexeme
     elif(next_expect == '<type>'):
       if(is_type(lexeme)):
-        type = lexeme
+        fn_info['type'] = lexeme
         expecting.pop()
         acc += lexeme
       else:
@@ -1170,6 +1218,8 @@ def validate_grammar_function_declaration(index_token):
     
     if(len(expecting) > 0):
       index_token += 1
+
+  add_type_token(fn_info['lexeme'], fn_info['acronym'], fn_info['type'], name_function=fn_info['lexeme'], return_type = 'function', params_types = param_types)
 
   print_if_missing_expecting(expecting)
   

@@ -1,3 +1,2 @@
-1 Error: Unexpected token boolan on line 132
-2 Error: Unexpected token teste on line 132
-3 Error: Unexpected token ; on line 132
+1 Error: Unexpected token , on line 142
+2 Error: Unexpected token , on line 142

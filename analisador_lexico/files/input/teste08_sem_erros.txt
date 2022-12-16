@@ -132,14 +132,14 @@ var {
 	boolean teste;
 }
 
-function int nome_funcao() {
+function int nome_funcao(int p1, string p1) {
 	print(1);
 	return 1;
 }
 
 procedure start() {
 	teste = false;
-	idade = nome_funcao();
+	idade = nome_funcao(idade, numero);
 	/*print("Digite o nome");
 	read(nome);
 	print("Digite a idade");
