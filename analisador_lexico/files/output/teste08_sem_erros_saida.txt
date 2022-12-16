@@ -7,52 +7,67 @@
 131 IDE idade
 131 DEL ;
 132 DEL }
-134 PRE procedure
-134 PRE start
+134 PRE function
+134 PRE int
+134 IDE nome_funcao
 134 DEL (
 134 DEL )
 134 DEL {
 135 PRE print
 135 DEL (
-135 CAC "Digite o nome"
+135 NRO 1
 135 DEL )
 135 DEL ;
-136 PRE read
-136 DEL (
-136 IDE nome
-136 DEL )
+136 PRE return
+136 NRO 1
 136 DEL ;
-137 PRE print
-137 DEL (
-137 CAC "Digite a idade"
-137 DEL )
-137 DEL ;
-138 PRE read
-138 DEL (
-138 IDE idade
-138 DEL )
-138 DEL ;
-140 PRE if
+137 DEL }
+139 PRE procedure
+139 PRE start
+139 DEL (
+139 DEL )
+139 DEL {
+140 PRE print
 140 DEL (
-140 IDE idade
-140 REL >=
-140 NRO 150
+140 CAC "Digite o nome"
 140 DEL )
-140 PRE then
-140 DEL {
-141 PRE print
+140 DEL ;
+141 PRE read
 141 DEL (
-141 CAC "pode aposentar kkkk"
+141 IDE nome
 141 DEL )
 141 DEL ;
-142 DEL }
-142 PRE else
-142 DEL {
-143 PRE print
+142 PRE print
+142 DEL (
+142 CAC "Digite a idade"
+142 DEL )
+142 DEL ;
+143 PRE read
 143 DEL (
-143 CAC "vai trabalhar"
+143 IDE idade
 143 DEL )
 143 DEL ;
-144 DEL }
-146 DEL }
+145 PRE if
+145 DEL (
+145 IDE idade
+145 REL >=
+145 NRO 150
+145 DEL )
+145 PRE then
+145 DEL {
+146 PRE print
+146 DEL (
+146 CAC "pode aposentar kkkk"
+146 DEL )
+146 DEL ;
+147 DEL }
+147 PRE else
+147 DEL {
+148 PRE print
+148 DEL (
+148 CAC "vai trabalhar"
+148 DEL )
+148 DEL ;
+149 DEL }
+151 DEL }
 

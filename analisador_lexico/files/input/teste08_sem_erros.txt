@@ -131,6 +131,11 @@ var {
 	int idade;
 }
 
+function int nome_funcao() {
+	print(1);
+	return 1;
+}
+
 procedure start() {
 	print("Digite o nome");
 	read(nome);

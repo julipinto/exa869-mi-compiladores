@@ -29,8 +29,8 @@ IDE_PRODUCTIONS = ['IDE', 'MATRIX', 'COMPOUND_TYPE']
 ############################################### DECLARATION TABLE  ###############################################
 type_tokens = []
 
-def add_type_token(lexeme, acronym, type, return_type = '-', params_type = '-'):
-  type_tokens.append({'lexema': lexeme, 'estrutura lexica': acronym, 'type': type, 'return_type': return_type, 'params_type': params_type})
+def add_type_token(lexeme, acronym, type, name_function = '-', return_type = '-', params_type = '-'):
+  type_tokens.append({'lexema': lexeme, 'estrutura lexica': acronym, 'type': type, 'name_function': name_function, 'return_type': return_type, 'params_type': params_type})
 
 def find_lexeme_in_table(lexeme):
   for token in type_tokens:
@@ -1106,8 +1106,8 @@ def validate_grammar_function_declaration(index_token):
       else:
         acc += unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
     elif(next_expect in [lexeme, acronym]):
-      if(next_expect == acronym):
-        add_type_token(lexeme, acronym, type, return_type = 'function')
+      if(next_expect == 'IDE'):
+        add_type_token(lexeme, acronym, type, name_function= lexeme, return_type = 'function')
       expecting.pop()
       acc += lexeme
     elif(next_expect == '<type>'):
