@@ -879,7 +879,7 @@ def validate_arg_arithmetic_expression(valid_args_list, index_token, lexeme_var 
       (index_token, lexeme) = validate_matrix(index_token)
     else:
       if(lexeme_var):
-        check_types(lexeme_var, lexeme, line, acronym)
+        compare_types(lexeme_var, lexeme, line)
     return index_token, lexeme
 
   elif(ACR_NUM in valid_args_list and acronym == ACR_NUM):
