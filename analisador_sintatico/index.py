@@ -470,7 +470,7 @@ def validate_variable_assignment(index_token, lexeme_var = None):
 
     (index, _) = validate_arg_arithmetic_expression([ACR_IDE, ACR_NUM], index_token, return_error = False)
     if(index+1 < len(tokens) and tokens[index+1][1] == ACR_ART):
-      (index_token, accum) = validate_grammar_arithmetic_expression(index_token)
+      (index_token, accum) = validate_grammar_arithmetic_expression(index_token, lexeme_var)
       index_token -= 1
       return (index_token, accum)
 
@@ -859,9 +859,9 @@ def validate_arg_logical_expression(index_token, return_error = True):
   return index_token, lexeme
 
 
-def validate_arg_arithmetic_expression(valid_args_list, index_token, return_error = True):
+def validate_arg_arithmetic_expression(valid_args_list, index_token, lexeme_var = None, return_error = True):
   # By indicating a list of acceptable tokens, this function will validate if the next token is in the list
-  [_, acronym, lexeme] = tokens[index_token]
+  [line, acronym, lexeme] = tokens[index_token]
   has_parentheses = True
 
   if(not return_error):
@@ -877,9 +877,14 @@ def validate_arg_arithmetic_expression(valid_args_list, index_token, return_erro
       (index_token, lexeme) = validate_compound_type(index_token)
     elif(acronym == ACR_IDE and tokens[index_token+1][2] == '['): 
       (index_token, lexeme) = validate_matrix(index_token)
+    else:
+      if(lexeme_var):
+        check_types(lexeme_var, lexeme, line, acronym)
     return index_token, lexeme
 
   elif(ACR_NUM in valid_args_list and acronym == ACR_NUM):
+    if(lexeme_var):
+      check_types(lexeme_var, lexeme, line, acronym)
     return index_token, lexeme
   else:
     if(return_error):
@@ -939,7 +944,7 @@ def validate_grammar_logical_expression(index_token):
 
 ############################################# ARITHMETIC EXPRESSIONS #############################################
 
-def validate_grammar_arithmetic_expression(index_token):
+def validate_grammar_arithmetic_expression(index_token, lexeme_var):
   expecting = create_stack(['<value>', 'ART', '<value>'])
   acc = ""
   parentheses = []
@@ -981,7 +986,7 @@ def validate_grammar_arithmetic_expression(index_token):
 
       if(next_expect == '<value>'):
         valid_args = [ACR_IDE, ACR_NUM]
-        (index_token, accum) = validate_arg_arithmetic_expression(valid_args, index_token)
+        (index_token, accum) = validate_arg_arithmetic_expression(valid_args, index_token, lexeme_var = lexeme_var)
         if(accum != False):
           expecting.pop()
           acc += accum

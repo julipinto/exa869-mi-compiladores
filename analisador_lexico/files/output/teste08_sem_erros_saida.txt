@@ -43,12 +43,18 @@
 141 DEL ;
 142 IDE idade
 142 REL =
-142 IDE nome_funcao
-142 DEL (
-142 IDE idade
-142 DEL ,
-142 IDE numero
-142 DEL )
+142 NRO 1
+142 ART +
+142 IDE teste
 142 DEL ;
-156 DEL }
+143 IDE idade
+143 REL =
+143 IDE nome_funcao
+143 DEL (
+143 IDE idade
+143 DEL ,
+143 IDE nome
+143 DEL )
+143 DEL ;
+157 DEL }
 

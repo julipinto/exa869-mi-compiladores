@@ -1,2 +1,1 @@
-1 Error: Unexpected token , on line 142
-2 Error: Unexpected token , on line 142
+1 Error: Unexpected token "oi" on line 142

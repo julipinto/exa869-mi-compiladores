@@ -139,7 +139,8 @@ function int nome_funcao(int p1, string p1) {
 
 procedure start() {
 	teste = false;
-	idade = nome_funcao(idade, numero);
+	idade = 1 + teste;
+	idade = nome_funcao(idade, nome);
 	/*print("Digite o nome");
 	read(nome);
 	print("Digite a idade");
