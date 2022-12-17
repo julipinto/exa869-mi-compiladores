@@ -129,6 +129,7 @@ var { string d= 3, d=4;
 var {
 	string nome;
 	int idade, numero;
+	real numero_real;
 	boolean teste;
 }
 
@@ -139,7 +140,7 @@ function int nome_funcao(int p1, string p1) {
 
 procedure start() {
 	teste = false;
-	idade = 1 + numero;
+	idade = 1 + teste;
 	idade = nome_funcao(idade, nome);
 	/*print("Digite o nome");
 	read(nome);

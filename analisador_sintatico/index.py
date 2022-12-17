@@ -68,9 +68,8 @@ def check_types(lexeme_var, lexeme, line, acronym):
   lexeme_type = info['type']
   if(not (
     (lexeme_type == 'string' and acronym == 'CAC') or
-    (lexeme_type == 'int' and acronym == 'NRO') or 
-    (lexeme_type == 'boolean' and is_boolean(lexeme)) or 
-    (lexeme_type == 'real' and acronym == 'NRO')
+    (lexeme_type in ['int', 'real'] and acronym == 'NRO') or 
+    (lexeme_type == 'boolean' and is_boolean(lexeme))
     )):
     type_error(lexeme, line)
 
@@ -80,7 +79,7 @@ def compare_types(lexeme_var, lexeme_value, line):
     info_value = find_lexeme_in_table(lexeme_value)
     info_value = info_value if info_value else find_declared_function(lexeme_value)
     if(info_value):
-      if(info_var['type'] != info_value['type']):
+      if(info_var['type'] != info_value['type'] and not (info_var['type'] in ['int', 'real'] and info_value['type'] in ['int', 'real'])):
         type_error(lexeme_value, line)
     else:
       not_declared_error(lexeme_value, line)
