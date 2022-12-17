@@ -1379,11 +1379,20 @@ def validate_grammar_block(index_token):
   return index_token, acc
 
 
-def salvar_analise_arquivo(name_file):
+def salvar_analise_sintatica_arquivo(name_file):
   sys.path.append(os.path.abspath('.'))
-  name_file = os.path.dirname(__file__) + str('\output_errors\/')+(os.path.splitext(name_file)[0])+'_errors.txt'
+  name_file = os.path.dirname(__file__) + str('\output_sintatic_errors\/')+(os.path.splitext(name_file)[0])+'_errors.txt'
   arquivo = open(name_file, 'w+', encoding="utf-8")
   for i, erro in enumerate(errors):
+    str_erro = str(i+1) + " " + str(erro)
+    arquivo.write(str_erro+'\n')
+  arquivo.close()
+
+def salvar_analise_semantica_arquivo(name_file):
+  sys.path.append(os.path.abspath('.'))
+  name_file = os.path.dirname(__file__) + str('\output_semantic_errors\/')+(os.path.splitext(name_file)[0])+'_errors.txt'
+  arquivo = open(name_file, 'w+', encoding="utf-8")
+  for i, erro in enumerate(errors_semantic):
     str_erro = str(i+1) + " " + str(erro)
     arquivo.write(str_erro+'\n')
   arquivo.close()
@@ -1391,7 +1400,7 @@ def salvar_analise_arquivo(name_file):
 ############################################### MAIN ###############################################
 
 def run_sintatic():
-  global tokens, file_name, errors
+  global tokens, file_name, errors, errors_semantic
   index_token = 0
 
   for (file_name, tokens) in all_lexical_tokens:
@@ -1421,8 +1430,11 @@ def run_sintatic():
         unexpect_error_handler(lexeme, line, reference=getframeinfo(currentframe()).lineno)
       index_token += 1
     if(errors):
-      salvar_analise_arquivo(file_name)
+      salvar_analise_sintatica_arquivo(file_name)
       errors = []
+    elif(errors_semantic):
+      salvar_analise_semantica_arquivo(file_name)
+      errors_semantic = []
     else:
       print(green_painting('Sucesso na execução do arquivo ' + file_name + ' !'))
     print(type_tokens)
